@@ -65,6 +65,7 @@
                 v-model="isAllSelected"
                 @change="handleSelectAll"
                 size="small"
+                :disabled="isUsingTemplate"
               >
                 全选
               </el-checkbox>

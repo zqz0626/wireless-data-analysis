@@ -57,7 +57,7 @@
           <div class="config-section">
             <div class="feature-selection-area">
               <div class="select-all-container">
-                <el-checkbox v-model="isAllAreasSelected" @change="handleAreasSelectAll" size="small">全选</el-checkbox>
+                <el-checkbox v-model="isAllAreasSelected" @change="handleAreasSelectAll" size="small" :disabled="isUsingTemplate">全选</el-checkbox>
                 <el-input
                   v-model="areaSearchKeyword"
                   size="small"
@@ -83,7 +83,7 @@
                 <el-tag
                   v-for="area in filteredSelectedAreas"
                   :key="area"
-                  closable
+                  :closable="!isUsingTemplate"
                   size="small"
                   class="feature-tag"
                   @close="removeArea(area)"
@@ -98,36 +98,36 @@
           <div class="config-section">
             <div class="feature-selection-area">
               <div class="select-all-container">
-                <el-checkbox v-model="isAllModelsSelected" @change="handleModelsSelectAll" size="small">全选</el-checkbox>
+                <el-checkbox v-model="isAllModelsSelected" @change="handleModelsSelectAll" size="small" :disabled="isUsingTemplate">全选</el-checkbox>
               </div>
               <div class="feature-list">
-                <el-checkbox-group v-model="selectedModels" @change="handleModelsSelect">
+                <el-checkbox-group v-model="selectedModels" @change="handleModelsSelect" :disabled="isUsingTemplate">
                   <!-- 统计模型 -->
                   <div class="model-category">
                     <span class="category-title">统计模型：</span>
-                    <el-checkbox label="stl_reg" size="small" class="feature-checkbox">STL + 线性回归</el-checkbox>
-                    <el-checkbox label="sarima" size="small" class="feature-checkbox">SARIMA（季节 ARIMA）</el-checkbox>
+                    <el-checkbox label="stl_reg" size="small" class="feature-checkbox" :disabled="isUsingTemplate">STL + 线性回归</el-checkbox>
+                    <el-checkbox label="sarima" size="small" class="feature-checkbox" :disabled="isUsingTemplate">SARIMA（季节 ARIMA）</el-checkbox>
                   </div>
                   <!-- 机器学习模型 -->
                   <div class="model-category">
                     <span class="category-title">机器学习模型：</span>
-                    <el-checkbox label="xgboost" size="small" class="feature-checkbox">XGBoost 回归</el-checkbox>
-                    <el-checkbox label="lightgbm" size="small" class="feature-checkbox">LightGBM 回归</el-checkbox>
-                    <el-checkbox label="catboost" size="small" class="feature-checkbox">CatBoost 回归</el-checkbox>
-                    <el-checkbox label="xgb_rf_residual" size="small" class="feature-checkbox">XGBoost + 随机森林（残差）</el-checkbox>
+                    <el-checkbox label="xgboost" size="small" class="feature-checkbox" :disabled="isUsingTemplate">XGBoost 回归</el-checkbox>
+                    <el-checkbox label="lightgbm" size="small" class="feature-checkbox" :disabled="isUsingTemplate">LightGBM 回归</el-checkbox>
+                    <el-checkbox label="catboost" size="small" class="feature-checkbox" :disabled="isUsingTemplate">CatBoost 回归</el-checkbox>
+                    <el-checkbox label="xgb_rf_residual" size="small" class="feature-checkbox" :disabled="isUsingTemplate">XGBoost + 随机森林（残差）</el-checkbox>
                   </div>
                   <!-- 深度学习模型 -->
                   <div class="model-category">
                     <span class="category-title">深度学习模型：</span>
-                    <el-checkbox label="lstm" size="small" class="feature-checkbox">LSTM 神经网络</el-checkbox>
-                    <el-checkbox label="gru" size="small" class="feature-checkbox">GRU 神经网络</el-checkbox>
-                    <el-checkbox label="cnn" size="small" class="feature-checkbox">CNN 卷积神经网络</el-checkbox>
-                    <el-checkbox label="tcn" size="small" class="feature-checkbox">TCN 时间卷积网络</el-checkbox>
+                    <el-checkbox label="lstm" size="small" class="feature-checkbox" :disabled="isUsingTemplate">LSTM 神经网络</el-checkbox>
+                    <el-checkbox label="gru" size="small" class="feature-checkbox" :disabled="isUsingTemplate">GRU 神经网络</el-checkbox>
+                    <el-checkbox label="cnn" size="small" class="feature-checkbox" :disabled="isUsingTemplate">CNN 卷积神经网络</el-checkbox>
+                    <el-checkbox label="tcn" size="small" class="feature-checkbox" :disabled="isUsingTemplate">TCN 时间卷积网络</el-checkbox>
                   </div>
                   <!-- 大模型 -->
                   <div class="model-category">
                     <span class="category-title">大模型：</span>
-                    <el-checkbox label="llm_forecast" size="small" class="feature-checkbox">
+                    <el-checkbox label="llm_forecast" size="small" class="feature-checkbox" :disabled="isUsingTemplate">
                       大模型预测（gpt-oss:20b）
                     </el-checkbox>
                   </div>
@@ -138,7 +138,7 @@
                 <el-tag
                   v-for="model in selectedModels"
                   :key="model"
-                  closable
+                  :closable="!isUsingTemplate"
                   size="small"
                   class="feature-tag"
                   @close="removeModel(model)"
@@ -173,19 +173,20 @@
                         :min="2"
                         :max="10000"
                         size="small"
+                        :disabled="isUsingTemplate"
                       />
                       <span class="small-text">（例如 144=1天，288=2天，单位：时间步）</span>
                     </div>
                     <div class="param-row">
                       <span class="param-label">趋势阶数 degree：</span>
-                      <el-select v-model="modelParams.stl_reg.degree" size="small" style="width: 120px;">
+                      <el-select v-model="modelParams.stl_reg.degree" size="small" style="width: 120px;" :disabled="isUsingTemplate">
                         <el-option :value="1" label="1 阶（线性）" />
                         <el-option :value="2" label="2 阶（抛物线）" />
                         <el-option :value="3" label="3 阶（更灵活）" />
                       </el-select>
                     </div>
                     <div class="param-row">
-                      <el-checkbox v-model="modelParams.stl_reg.robust" size="small">
+                      <el-checkbox v-model="modelParams.stl_reg.robust" size="small" :disabled="isUsingTemplate">
                         使用鲁棒 STL（抗异常值）
                       </el-checkbox>
                     </div>
@@ -196,6 +197,7 @@
                         :min="0"
                         :max="180"
                         size="small"
+                        :disabled="isUsingTemplate"
                       />
                       <span class="small-text">（0 或不填：使用全部数据；&gt;0：仅使用最近 N 天数据建模）</span>
                     </div>
@@ -1393,6 +1395,48 @@
         <el-button size="large" @click="resetPredictConfig">重置</el-button>
       </div>
     </el-card>
+    
+    <!-- 预测进度条 -->
+    <el-card shadow="never" v-if="isPredicting">
+      <template #header>
+        <div class="card-header"><span>预测进度</span></div>
+      </template>
+      <div class="predict-progress-wrapper">
+        <div class="predict-progress-left">
+          <el-progress
+            :percentage="totalTasks > 0 ? Math.round((currentTaskIndex / totalTasks) * 100) : 0"
+            :status="stopRequested ? 'exception' : 'active'"
+            :stroke-width="20"
+            :text-inside="true"
+            style="margin-bottom: 16px;"
+          />
+          <div class="predict-progress-info">
+            <div class="progress-line">
+              <span class="progress-label">当前任务：</span>
+              <span class="progress-value">{{ currentAreaInProgress }} - {{ getModelName(currentModelInProgress) }}</span>
+            </div>
+            <div class="progress-line">
+              <span class="progress-label">进度：</span>
+              <span class="progress-value">{{ currentTaskIndex }} / {{ totalTasks }} 任务</span>
+            </div>
+            <div class="progress-line">
+              <span class="progress-label">当前模型时间：</span>
+              <span class="progress-value">{{ formatTime(currentTaskElapsedSeconds) }}</span>
+            </div>
+            <div class="progress-line">
+              <span class="progress-label">总预测时间：</span>
+              <span class="progress-value">{{ formatTime(elapsedSeconds) }}</span>
+            </div>
+          </div>
+        </div>
+        <div class="predict-progress-actions">
+          <el-button type="danger" size="large" @click="stopPredict">
+            <el-icon><CircleCloseFilled /></el-icon>
+            终止预测
+          </el-button>
+        </div>
+      </div>
+    </el-card>
 
     <!-- 历史模板板块 -->
     <el-card shadow="never" class="template-card">
@@ -1520,9 +1564,10 @@
           <el-table-column prop="grade" label="评级" min-width="90" align="center" sortable="custom">
             <template #default="scope">
               <el-tag
-                :type="scope.row.grade === '优' ? 'success' : scope.row.grade === '良' ? 'primary' : scope.row.grade === '中' ? 'warning' : 'danger'"
+                :style="scope.row.grade === '良' ? { borderColor: '#165DFF', color: '#165DFF' } : ''"
+                :type="scope.row.grade === '优' ? 'success' : scope.row.grade === '中' ? 'warning' : scope.row.grade === '差' ? 'danger' : ''"
                 size="small"
-                effect="light"
+                effect="plain"
               >
                 {{ scope.row.grade }}
               </el-tag>
@@ -1536,7 +1581,7 @@
               <span class="rule-text">评分 ≥ 90</span>
             </div>
             <div class="rule-item">
-              <el-tag type="primary" size="small" effect="plain">良</el-tag>
+              <el-tag size="small" effect="plain" style="border-color: #165DFF; color: #165DFF;">良</el-tag>
               <span class="rule-text">评分 ≥ 80</span>
             </div>
             <div class="rule-item">
@@ -1608,9 +1653,10 @@
           <el-table-column prop="grade" label="综合评级" min-width="90" align="center" sortable="custom">
             <template #default="scope">
               <el-tag
-                :type="scope.row.grade === '优' ? 'success' : scope.row.grade === '良' ? 'primary' : scope.row.grade === '中' ? 'warning' : 'danger'"
+                :style="scope.row.grade === '良' ? { borderColor: '#165DFF', color: '#165DFF' } : ''"
+                :type="scope.row.grade === '优' ? 'success' : scope.row.grade === '中' ? 'warning' : scope.row.grade === '差' ? 'danger' : ''"
                 size="small"
-                effect="light"
+                effect="plain"
               >
                 {{ scope.row.grade }}
               </el-tag>
@@ -2187,32 +2233,36 @@ export default {
             columns: response.data.columns || []
           }
           // 不默认选择地区列，让用户手动选择
-          if (this.fileInfo.columns && this.fileInfo.columns.length > 1) {
+          // 但在使用模板时，保持模板中的地区选择
+          if (this.fileInfo.columns && this.fileInfo.columns.length > 1 && !this.isUsingTemplate) {
             this.selectedAreas = []  // 默认不选择任何地区
             this.isAllAreasSelected = false
           }
 
           // 加载新文件时，重置上一批预测/图表状态，避免不同数据源之间互相干扰
-          this.singleResult = null
-          this.selectedAreaForChart = ''
-          this.isPredicting = false
-          this.predictStartTime = null
-          this.elapsedSeconds = 0
-          this.currentTaskStartTime = null
-          this.currentTaskElapsedSeconds = 0
-          this.totalTasks = 0
-          this.currentTaskIndex = 0
-          this.currentAreaInProgress = ''
-          this.currentModelInProgress = ''
-          this.stopRequested = false
-          if (this._elapsedTimer) {
-            clearInterval(this._elapsedTimer)
-            this._elapsedTimer = null
-          }
-          if (this.chart) {
-            window.removeEventListener('resize', this.handleResize)
-            this.chart.dispose()
-            this.chart = null
+          // 但在使用模板时，保持模板中的结果数据
+          if (!this.isUsingTemplate) {
+            this.singleResult = null
+            this.selectedAreaForChart = ''
+            this.isPredicting = false
+            this.predictStartTime = null
+            this.elapsedSeconds = 0
+            this.currentTaskStartTime = null
+            this.currentTaskElapsedSeconds = 0
+            this.totalTasks = 0
+            this.currentTaskIndex = 0
+            this.currentAreaInProgress = ''
+            this.currentModelInProgress = ''
+            this.stopRequested = false
+            if (this._elapsedTimer) {
+              clearInterval(this._elapsedTimer)
+              this._elapsedTimer = null
+            }
+            if (this.chart) {
+              window.removeEventListener('resize', this.handleResize)
+              this.chart.dispose()
+              this.chart = null
+            }
           }
 
           ElMessage.success('文件信息加载成功')
@@ -3044,11 +3094,26 @@ export default {
     handleAccuracySortChange({ prop, order }) {
       this.accuracySort = { prop, order }
     },
+    
+    // 终止预测
+    stopPredict() {
+      this.stopRequested = true
+    },
+    
+    // 格式化时间显示
+    formatTime(seconds) {
+      const mins = Math.floor(seconds / 60)
+      const secs = Math.floor(seconds % 60)
+      return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
+    },
     // 跨文件平均分表排序事件
     handleCrossFileSortChange({ prop, order }) {
       this.crossFileSort = { prop, order }
     },
     removeModel(model) {
+      // 使用模板时禁止删除模型
+      if (this.isUsingTemplate) return
+      
       this.selectedModels = this.selectedModels.filter(m => m !== model)
       // 标签删除时也要刷新全选状态
       this.handleModelsSelect()
@@ -3100,7 +3165,8 @@ export default {
           modelParams: JSON.parse(JSON.stringify(this.modelParams))
         },
         results: {
-          // 只保存必要的结果信息，不保存完整的预测结果
+          // 保存完整的预测结果
+          singleResult: JSON.parse(JSON.stringify(this.singleResult)),
           selectedAreaForChart: this.selectedAreaForChart,
           showActual: this.showActual,
           showHistoryPred: this.showHistoryPred,
@@ -3127,16 +3193,23 @@ export default {
     async loadTemplate(template) {
       if (!template) return
       
+      // 设置使用模板标志
+      this.isUsingTemplate = true
+      
+      // 加载模板配置
+      this.selectedAreas = [...template.config.areas]
+      this.selectedModels = [...template.config.models]
+      this.modelParams = JSON.parse(JSON.stringify(template.config.modelParams))
+      
       // 检查模板创建时的原文件是否存在
       const originalFile = template.results?.originalFile
       if (originalFile) {
         try {
-          // 尝试加载文件信息
-          await this.loadFileInfo(originalFile.id)
-          // 原文件存在，自动加载
+          // 先设置文件ID
           this.selectedFileId = originalFile.id
-          // 设置使用模板标志，禁用地区选择
-          this.isUsingTemplate = true
+          
+          // 尝试加载文件信息
+          await this.loadFileInfo(this.selectedFileId)
         } catch (error) {
           // 原文件不存在，给出明确的提示
           console.error('原文件不存在，无法加载:', error)
@@ -3145,36 +3218,41 @@ export default {
       } else if (template.config.fileId) {
         // 尝试从配置中获取文件ID
         try {
-          await this.loadFileInfo(template.config.fileId)
+          // 先设置文件ID
           this.selectedFileId = template.config.fileId
-          this.isUsingTemplate = true
+          
+          // 尝试加载文件信息
+          await this.loadFileInfo(this.selectedFileId)
         } catch (error) {
           console.error('加载文件信息失败:', error)
           ElMessage.error('无法加载模板对应的文件')
         }
       }
       
-      // 加载模板配置
-      this.selectedAreas = [...template.config.areas]
-      this.selectedModels = [...template.config.models]
-      this.modelParams = JSON.parse(JSON.stringify(template.config.modelParams))
+      // 确保fileInfo和columns属性存在，以便areaColumns计算属性能正常工作
+      if (!this.fileInfo || !this.fileInfo.columns) {
+        // 从模板配置中提取地区列表，确保areaColumns能正确生成
+        this.fileInfo = {
+          ...this.fileInfo,
+          columns: ['时间', ...this.selectedAreas] // 假设第一列是时间，后面是地区
+        }
+      }
       
       // 如果模板包含结果数据，直接加载结果，不需要重新计算
       if (template.results) {
         this.singleResult = JSON.parse(JSON.stringify(template.results.singleResult))
-        // 不自动设置选中地区，让用户手动选择
-        this.selectedAreaForChart = ''
+        // 自动选择第一个地区，以便显示结果
+        this.selectedAreaForChart = this.selectedAreas[0] || ''
         this.showActual = template.results.showActual
         this.showHistoryPred = template.results.showHistoryPred
         this.showFuturePred = template.results.showFuturePred
         
-        // 渲染图表基本框架，包括坐标轴、dataZoom等，这样第一次选择地区时，dataZoom功能就可以正常使用
-        // 确保图表完全空白，没有任何之前的数据残留
+        // 渲染图表
         this.$nextTick(() => {
-          this.renderChartFramework()
+          this.updateChart()
         })
         
-        ElMessage.success('模板加载成功，请选择地区查看分析结果')
+        ElMessage.success('模板加载成功，已自动选择第一个地区显示分析结果')
       } else {
         ElMessage.success('模板加载成功，请点击执行按钮进行分析')
       }

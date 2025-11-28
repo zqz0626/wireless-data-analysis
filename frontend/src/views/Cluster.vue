@@ -87,7 +87,7 @@
           <div class="config-section">
             <div class="feature-selection-area">
               <div class="select-all-container">
-                <el-checkbox v-model="isAllFeaturesSelected" @change="handleFeaturesSelectAll" size="small">全选</el-checkbox>
+                <el-checkbox v-model="isAllFeaturesSelected" @change="handleFeaturesSelectAll" size="small" :disabled="isUsingTemplate">全选</el-checkbox>
                 <el-input
                   v-model="featureSearchKeyword"
                   size="small"
@@ -107,7 +107,7 @@
               </div>
               <div class="selected-features-display" v-if="clusterConfig.features.length > 0">
                 <span class="selection-label">已选择地区：</span>
-                <el-tag v-for="feature in displayedClusterTags" :key="feature" closable @close="removeFeature(feature)" size="small" :title="feature" class="feature-tag">{{ feature }}</el-tag>
+                <el-tag v-for="feature in displayedClusterTags" :key="feature" :closable="!isUsingTemplate" @close="removeFeature(feature)" size="small" :title="feature" class="feature-tag">{{ feature }}</el-tag>
               </div>
             </div>
           </div>
