@@ -41,7 +41,6 @@ class TemplateResponse(BaseModel):
     config: Dict[str, Any]
     results: Dict[str, Any]
     created_at: str
-    updated_at: str
 
     class Config:
         from_attributes = True
@@ -140,8 +139,7 @@ async def create_template(
         "type": db_template.type,
         "config": json.loads(db_template.config),
         "results": json.loads(db_template.results),
-        "created_at": db_template.created_at.isoformat(),
-        "updated_at": db_template.updated_at.isoformat() if db_template.updated_at else db_template.created_at.isoformat()
+        "created_at": db_template.created_at.isoformat()
     }
 
 
@@ -169,8 +167,7 @@ async def get_templates(
         "type": template.type,
         "config": json.loads(template.config),
         "results": json.loads(template.results),
-        "created_at": template.created_at.isoformat(),
-        "updated_at": template.updated_at.isoformat() if template.updated_at else template.created_at.isoformat()
+        "created_at": template.created_at.isoformat()
     } for template in templates]
 
 
@@ -194,8 +191,7 @@ async def get_template(
         "type": template.type,
         "config": json.loads(template.config),
         "results": json.loads(template.results),
-        "created_at": template.created_at.isoformat(),
-        "updated_at": template.updated_at.isoformat() if template.updated_at else template.created_at.isoformat()
+        "created_at": template.created_at.isoformat()
     }
 
 

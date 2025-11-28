@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 更新数据库表结构脚本
-用于将templates表的results列类型从TEXT改为LONGTEXT
+用于删除templates表中的updated_at列
 """
 
 import sys
@@ -24,15 +24,10 @@ def update_table_structure():
             trans = connection.begin()
             
             try:
-                # 修改results列类型为LONGTEXT
-                alter_table_sql = text("ALTER TABLE templates MODIFY COLUMN results LONGTEXT COLLATE 'utf8mb4_general_ci' NULL")
+                # 删除updated_at列
+                alter_table_sql = text("ALTER TABLE templates DROP COLUMN updated_at")
                 connection.execute(alter_table_sql)
-                print("✅ 成功将results列类型从TEXT改为LONGTEXT")
-                
-                # 修改config列类型为LONGTEXT（可选，为了一致性）
-                alter_table_sql = text("ALTER TABLE templates MODIFY COLUMN config LONGTEXT COLLATE 'utf8mb4_general_ci' NOT NULL")
-                connection.execute(alter_table_sql)
-                print("✅ 成功将config列类型从TEXT改为LONGTEXT")
+                print("✅ 成功删除updated_at列")
                 
                 # 提交事务
                 trans.commit()

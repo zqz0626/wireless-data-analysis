@@ -18,4 +18,3 @@ class Template(Base):
     config = Column(Text, nullable=False)  # JSON格式的配置数据
     results = Column(LONGTEXT, nullable=True)  # 使用LONGTEXT存储大JSON数据，支持更大的数据量（4GB）
     created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
