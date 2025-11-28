@@ -26,19 +26,19 @@ export default {
           key: 'anomaly-detection',
           title: '异常检测',
           en: 'Anomaly Detection',
-          desc: '基于多维数值特征和孤立森林等无监督方法发现异常点，并通过分数、触发特征和时间轴可视化帮助理解异常模式。'
+          desc: '基于多维数值特征和孤立森林等无监督方法发现异常点，并通过分数、触发特征和时间轴可视化帮助理解异常模式，支持历史模型记录与复用。'
         },
         {
           key: 'clustering-analysis',
           title: '聚类分析',
           en: 'Clustering Analysis',
-          desc: '集成多种聚类算法并提供可视化与簇特征画像，从空间和时间两个维度对区域进行分群和趋势分类。'
+          desc: '集成多种聚类算法并提供可视化与簇特征画像，从维度对区域进行分群和趋势分类，支持历史模型记录与复用。'
         },
         {
           key: 'prediction',
           title: '预测分析',
           en: 'Prediction Analysis',
-          desc: '支持统计、机器学习、混合与深度学习等多类预测算法，并通过误差指标与曲线对比可视化评估预测效果。'
+          desc: '支持统计、机器学习、混合与深度学习等多类预测算法，并通过误差指标与曲线对比可视化评估预测效果，支持历史模型记录与复用。'
         }
       ],
       // 技术栈相关配置
@@ -48,7 +48,9 @@ export default {
       techStackFrontendEn: '前端',
       techStackBackend: 'Backend: FastAPI + Uvicorn + Pydantic',
       techStackBackendEn: '后端',
-      // 左侧阶段：0=标题页，1=前端技术栈，2=后端技术栈，3=空白
+      techStackDatabase: 'Database: MySQL + SQLAlchemy',
+      techStackDatabaseEn: '数据库',
+      // 左侧阶段：0=标题页，1=前端技术栈，2=后端技术栈，3=数据库技术栈，4=空白
       leftStage: 0,
       // 右侧阶段：0=目录页，1=数据管理，2=预处理，3=异常检测，4=聚类分析，5=预测分析，6=空白
       rightStage: 0,
@@ -62,10 +64,10 @@ export default {
   computed: {
     /**
      * 获取左侧当前阶段类型
-     * @returns {string} 阶段类型：intro|frontend|backend|none
+     * @returns {string} 阶段类型：intro|frontend|backend|database|none
      */
     leftStageType() {
-      const map = ['intro', 'frontend', 'backend', 'none']
+      const map = ['intro', 'frontend', 'backend', 'database', 'none']
       return map[this.leftStage] || 'intro'
     },
     /**
@@ -83,7 +85,7 @@ export default {
      * 点击图钉后，当前页掉落，显示下一页
      */
     nextLeftStage() {
-      if (this.isLeftAnimating || this.leftStage >= 3) return
+      if (this.isLeftAnimating || this.leftStage >= 4) return
       this.isLeftAnimating = true
       
       // 0.8秒后切换到下一页，确保动画流畅
@@ -186,6 +188,10 @@ export default {
                 <span class="tech-stack-title-cn">{{ techStackBackendEn }}</span>
                 <span class="tech-stack-title-en">{{ techStackBackend }}</span>
               </div>
+              <div class="tech-stack-row">
+                <span class="tech-stack-title-cn">{{ techStackDatabaseEn }}</span>
+                <span class="tech-stack-title-en">{{ techStackDatabase }}</span>
+              </div>
             </div>
           </div>
         </transition>
@@ -241,6 +247,27 @@ export default {
                   <div class="tech-item">
                     <span class="tech-item-name">pydantic-settings</span>
                     <span class="tech-item-desc">用于管理应用配置与环境变量，支持不同环境下的统一配置管理</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </transition>
+        
+        <!-- 阶段 3：数据库技术栈 -->
+        <transition name="fall-down">
+          <div v-if="leftStageType === 'database'" class="tech-stack-detail-content backend-stack">
+            <div class="tech-stack-header backend-title">数据库技术栈</div>
+            <div class="tech-stack-body">
+              <div class="tech-section">
+                <div class="tech-section-content">
+                  <div class="tech-item">
+                    <span class="tech-item-name">MySQL</span>
+                    <span class="tech-item-desc">作为关系型数据库，存储系统配置、模板数据和分析结果，提供可靠的数据持久化支持</span>
+                  </div>
+                  <div class="tech-item">
+                    <span class="tech-item-name">SQLAlchemy</span>
+                    <span class="tech-item-desc">作为 Python ORM 框架，简化数据库操作，提供统一的数据访问接口，支持多种数据库后端</span>
                   </div>
                 </div>
               </div>
@@ -359,6 +386,10 @@ export default {
                 <span class="module-item-name">生成文件</span>
                 <span class="module-item-desc">将异常检测结果导出为标准化文件，便于后续审查、归档或与其他系统联动。</span>
               </div>
+              <div class="module-item">
+                <span class="module-item-name">历史模型记录</span>
+                <span class="module-item-desc">支持保存和管理历史检测模型，可快速加载复用之前的配置和结果，提高分析效率。</span>
+              </div>
             </div>
           </div>
         </transition>
@@ -384,6 +415,10 @@ export default {
               <div class="module-item">
                 <span class="module-item-name">各簇趋势显示</span>
                 <span class="module-item-desc">结合时间序列行为展示各簇关键指标的走势，在同一数轴上绘制折线图对比更明显。</span>
+              </div>
+              <div class="module-item">
+                <span class="module-item-name">历史模型记录</span>
+                <span class="module-item-desc">支持保存和管理历史聚类模型，可快速加载复用之前的配置和结果，提高分析效率。</span>
               </div>
             </div>
           </div>
@@ -413,6 +448,10 @@ export default {
               <div class="module-item">
                 <span class="module-item-name">预测结果可视化与分析</span>
                 <span class="module-item-desc">通过折线图和误差指标对比展示不同算法在多区域的预测效果，用于选择最优方案和评估模型质量。</span>
+              </div>
+              <div class="module-item">
+                <span class="module-item-name">历史模型记录</span>
+                <span class="module-item-desc">支持保存和管理历史预测模型，可快速加载复用之前的配置和结果，提高分析效率。</span>
               </div>
             </div>
           </div>
