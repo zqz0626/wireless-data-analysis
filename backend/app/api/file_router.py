@@ -158,65 +158,10 @@ def load_file_db():
         file_db = []
 
 
-def _inherit_relations_from_parents() -> bool:
-    """Ensure derived data files inherit GeoJSON relation from their parents."""
-    changed = False
-    id_map = {f.get("id"): f for f in file_db if f.get("id")}
-
-    for file_info in file_db:
-        if file_info.get("file_type") != "data":
-            continue
-        if file_info.get("related_geojson_id"):
-            continue
-
-        parent_id = file_info.get("parent_file_id")
-
-        # 如果没有显式的父文件ID，尝试通过命名规则猜测：<base>_processed(.csv)
-        if not parent_id:
-            original_name = os.path.splitext(str(file_info.get("original_filename") or ""))[0]
-            match = re.match(r"^(.*)_processed(?:\(\d+\))?$", original_name)
-            if match:
-                guessed = match.group(1)
-                candidate = next(
-                    (
-                        f
-                        for f in file_db
-                        if f.get("file_type") == "data"
-                        and (
-                            f.get("id") == guessed
-                            or os.path.splitext(str(f.get("original_filename") or ""))[0] == guessed
-                        )
-                    ),
-                    None,
-                )
-                if candidate:
-                    parent_id = candidate.get("id")
-
-        visited: Set[str] = set()
-        while parent_id and parent_id not in visited:
-            visited.add(parent_id)
-            parent = id_map.get(parent_id)
-            if not parent:
-                break
-            related_geo_id = parent.get("related_geojson_id")
-            if related_geo_id:
-                file_info["related_geojson_id"] = related_geo_id
-                changed = True
-                break
-            parent_id = parent.get("parent_file_id")
-
-    return changed
 
 
-def _is_derived_data(file_info: Dict[str, Any]) -> bool:
-    """判断数据文件是否是预处理/派生文件，以避免误删共享的 GeoJSON。"""
-    if file_info.get("file_type") != "data":
-        return False
-    if file_info.get("parent_file_id"):
-        return True
 
-    original_name = os.path.splitext(str(file_info.get("original_filename") or ""))[0]
-    return bool(re.match(r"^(.*)_processed(?:\(\d+\))?$", original_name))
+
 
 
 def save_file_db():
@@ -276,10 +221,6 @@ def init_file_db():
                 except Exception as e:
                     print(f"加载文件 {filename} 失败: {str(e)}")
 
-    # 确保派生文件继承父文件的关联关系
-    if _inherit_relations_from_parents():
-        changed = True
-
     # 如果有变化，保存回持久化文件
     if changed:
         save_file_db()
@@ -295,82 +236,7 @@ async def upload_file(file: UploadFile = File(...)):
     return await _upload_single_file(file)
 
 
-@router.post("/upload-multiple", summary="上传多个关联文件")
-async def upload_multiple_files(files: List[UploadFile] = File(...)):
-    """
-    上传多个关联文件（强制：一个数据文件 + 一个GeoJSON文件）
-    """
-    if not files:
-        raise HTTPException(status_code=400, detail="请至少上传一个文件")
 
-    # 现在强制要求一次性上传两个文件：1 个数据文件（CSV/Excel）+ 1 个 GeoJSON/JSON
-    if len(files) != 2:
-        raise HTTPException(
-            status_code=400,
-            detail="必须同时上传一个数据文件（CSV/Excel）和一个GeoJSON文件"
-        )
-
-    # 验证文件类型组合
-    file_types = []
-    for file in files:
-        file_extension = os.path.splitext(file.filename)[1].lower()
-        if file_extension in ALLOWED_CSV_EXTENSIONS:
-            file_types.append("data")
-        elif file_extension in ALLOWED_GEOJSON_EXTENSIONS:
-            file_types.append("geojson")
-        else:
-            raise HTTPException(
-                status_code=400,
-                detail=f"不支持的文件格式: {file.filename}。支持的格式: {', '.join(ALLOWED_ALL_EXTENSIONS)}"
-            )
-
-    # 检查文件组合是否有效：必须恰好 1 个数据文件 + 1 个 GeoJSON 文件
-    if file_types.count("data") != 1 or file_types.count("geojson") != 1:
-        raise HTTPException(
-            status_code=400,
-            detail="文件组合无效。请上传一个数据文件（CSV/Excel）和一个GeoJSON文件"
-        )
-    
-    # 上传所有文件
-    uploaded_files = []
-    for file in files:
-        try:
-            result = await _upload_single_file(file)
-            uploaded_files.append(result["data"])
-        except Exception as e:
-            # 如果某个文件上传失败，删除已上传的文件
-            for uploaded_file in uploaded_files:
-                if os.path.exists(uploaded_file["path"]):
-                    os.remove(uploaded_file["path"])
-            # 保留业务校验产生的 HTTPException 状态码（如同名文件 400）
-            if isinstance(e, HTTPException):
-                raise e
-            raise HTTPException(status_code=500, detail=f"文件上传失败: {str(e)}")
-    
-    # 如果上传了两个文件，建立关联关系
-    if len(uploaded_files) == 2:
-        data_file = next((f for f in uploaded_files if f["file_type"] == "data"), None)
-        geojson_file = next((f for f in uploaded_files if f["file_type"] == "geojson"), None)
-        
-        if data_file and geojson_file:
-            # 建立关联关系
-            data_file["related_geojson_id"] = geojson_file["id"]
-            geojson_file["related_data_id"] = data_file["id"]
-            
-            # 更新数据库
-            for file_info in file_db:
-                if file_info["id"] == data_file["id"]:
-                    file_info["related_geojson_id"] = geojson_file["id"]
-                elif file_info["id"] == geojson_file["id"]:
-                    file_info["related_data_id"] = data_file["id"]
-            
-            save_file_db()
-    
-    return make_json_serializable({
-        "success": True,
-        "message": f"成功上传 {len(uploaded_files)} 个文件",
-        "data": uploaded_files
-    })
 
 
 async def _upload_single_file(file: UploadFile):
@@ -777,56 +643,28 @@ async def delete_file(file_id: str):
     删除指定文件
     """
     global file_db
-    # 查找待删除的主文件
-    primary = next((f for f in file_db if f.get("id") == file_id), None)
-    if primary is None:
+    # 查找待删除的文件
+    file_to_delete = next((f for f in file_db if f.get("id") == file_id), None)
+    if file_to_delete is None:
         raise HTTPException(status_code=404, detail="文件不存在")
 
-    # 计算需要一起删除的文件ID集合（成对删除）
-    ids_to_delete = {file_id}
-    related_id = None
-    file_type = primary.get("file_type")
-    if file_type == "data":
-        # 仅当该数据文件不是派生/预处理产物时，才级联删除 GeoJSON
-        if not _is_derived_data(primary):
-            related_id = primary.get("related_geojson_id")
-    elif file_type == "geojson":
-        related_id = primary.get("related_data_id")
-
-    if related_id:
-        ids_to_delete.add(related_id)
-
     try:
-        # 删除磁盘上的文件（主文件 + 关联文件）
-        for f in list(file_db):
-            if f.get("id") in ids_to_delete:
-                file_path = f.get("path")
-                if file_path and os.path.exists(file_path):
-                    try:
-                        os.remove(file_path)
-                    except Exception as e:
-                        # 磁盘删除失败时记录但不中断其他文件删除
-                        logger.error(f"删除文件失败: {file_path} - {e}")
+        # 删除磁盘上的文件
+        file_path = file_to_delete.get("path")
+        if file_path and os.path.exists(file_path):
+            try:
+                os.remove(file_path)
+            except Exception as e:
+                # 磁盘删除失败时记录错误
+                logger.error(f"删除文件失败: {file_path} - {e}")
 
-        # 从数据库中移除这些文件
-        file_db = [f for f in file_db if f.get("id") not in ids_to_delete]
-
-        # 清理剩余文件中的关联字段，避免悬空引用
-        for f in file_db:
-            if f.get("related_geojson_id") in ids_to_delete:
-                f.pop("related_geojson_id", None)
-            if f.get("related_data_id") in ids_to_delete:
-                f.pop("related_data_id", None)
+        # 从数据库中移除该文件
+        file_db = [f for f in file_db if f.get("id") != file_id]
 
         # 持久化 file_db
         save_file_db()
 
-        if len(ids_to_delete) > 1:
-            msg = "文件及其关联文件已删除"
-        else:
-            msg = "文件删除成功"
-
-        response_data = {"success": True, "message": msg}
+        response_data = {"success": True, "message": "文件删除成功"}
         return make_json_serializable(response_data)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"文件删除失败: {str(e)}")
@@ -1113,81 +951,7 @@ async def rename_file(file_id: str, new_name: str = Query(..., description="新�
         raise HTTPException(status_code=500, detail=f"重命名文件失败: {str(e)}")
 
 
-@router.get("/{file_id}/related", summary="获取文件关联信息")
-async def get_file_relations(file_id: str):
-    """
-    获取文件的关联信息（如关联的GeoJSON或数据文件）
-    """
-    # 查找文件
-    file_info = next((f for f in file_db if f["id"] == file_id), None)
-    if not file_info:
-        raise HTTPException(status_code=404, detail="文件不存在")
-    
-    related_files = []
-    
-    # 查找关联的GeoJSON文件
-    if file_info.get("file_type") == "data" and file_info.get("related_geojson_id"):
-        geojson_file = next((f for f in file_db if f["id"] == file_info["related_geojson_id"]), None)
-        if geojson_file:
-            related_files.append({
-                "id": geojson_file["id"],
-                "original_filename": geojson_file["original_filename"],
-                "file_type": "geojson",
-                "relation": "geojson_boundary"
-            })
-    
-    # 查找关联的数据文件
-    if file_info.get("file_type") == "geojson" and file_info.get("related_data_id"):
-        data_file = next((f for f in file_db if f["id"] == file_info["related_data_id"]), None)
-        if data_file:
-            related_files.append({
-                "id": data_file["id"],
-                "original_filename": data_file["original_filename"],
-                "file_type": "data",
-                "relation": "data_source"
-            })
-    
-    # 如果没有明确的关联关系，尝试基于文件名匹配
-    if not related_files:
-        file_name_root = os.path.splitext(file_info["original_filename"])[0]
-        
-        # 如果是数据文件，查找同名的GeoJSON文件
-        if file_info.get("file_type") == "data":
-            potential_geojson = [f for f in file_db 
-                               if f.get("file_type") == "geojson" 
-                               and os.path.splitext(f["original_filename"])[0] == file_name_root]
-            if potential_geojson:
-                related_files.append({
-                    "id": potential_geojson[0]["id"],
-                    "original_filename": potential_geojson[0]["original_filename"],
-                    "file_type": "geojson",
-                    "relation": "filename_matched"
-                })
-        
-        # 如果是GeoJSON文件，查找同名的数据文件
-        elif file_info.get("file_type") == "geojson":
-            potential_data = [f for f in file_db 
-                             if f.get("file_type") == "data" 
-                             and os.path.splitext(f["original_filename"])[0] == file_name_root]
-            if potential_data:
-                related_files.append({
-                    "id": potential_data[0]["id"],
-                    "original_filename": potential_data[0]["original_filename"],
-                    "file_type": "data",
-                    "relation": "filename_matched"
-                })
-    
-    return make_json_serializable({
-        "success": True,
-        "data": {
-            "file_info": {
-                "id": file_info["id"],
-                "original_filename": file_info["original_filename"],
-                "file_type": file_info.get("file_type", "unknown")
-            },
-            "related_files": related_files
-        }
-    })
+
 
 
 @router.get("/{file_id}/analyze", summary="智能分析文件并推荐配置")

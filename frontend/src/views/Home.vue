@@ -134,20 +134,33 @@ export default {
      * @param {string} path - 模块路由路径
      */
     goToModule(path) {
-      this.$router.push(path)
+      this.showFinalWelcome = false;
+      this.$router.push(path);
     },
     /**
      * 进入系统应用
      * 如果当前在初始状态，先显示最终欢迎页；否则直接跳转到数据管理页面
      */
     goToApp() {
-      if (this.leftStage === 0 && this.rightStage === 0) {
-        this.leftStage = 4
-        this.rightStage = 6
-        this.checkShowFinalWelcome()
-        return
+      // 如果当前显示欢迎页，先重置状态
+      if (this.showFinalWelcome) {
+        this.enterSystemFromWelcome();
+        this.$nextTick(() => {
+          this.$router.push('/app/data-manage');
+        });
+        return;
       }
-      this.$router.push('/app/data-manage')
+      
+      // 如果在初始状态，显示欢迎页
+      if (this.leftStage === 0 && this.rightStage === 0) {
+        this.leftStage = 4;
+        this.rightStage = 6;
+        this.checkShowFinalWelcome();
+        return;
+      }
+      
+      // 其他情况直接跳转到数据管理页面
+      this.$router.push('/app/data-manage');
     }
   }
 }
@@ -297,6 +310,7 @@ export default {
                 v-for="item in rightModules"
                 :key="item.key"
                 class="book-row"
+                @click="goToApp"
               >
                 <div class="book-row-main">
                   <span class="book-title-cn">{{ item.title }}</span>
@@ -462,23 +476,23 @@ export default {
         class="welcome-overlay"
       >
         <div class="welcome-tags">
-          <div class="welcome-tag tag-data" @click.stop="goToModule('/app/data-manage')">
+          <div class="welcome-tag tag-data" @click.stop="goToApp">
             <div class="welcome-tag-cn">数据管理</div>
             <div class="welcome-tag-en">Data Management</div>
           </div>
-          <div class="welcome-tag tag-preprocess" @click.stop="goToModule('/app/preprocess')">
+          <div class="welcome-tag tag-preprocess" @click.stop="goToApp">
             <div class="welcome-tag-cn">预处理配置</div>
             <div class="welcome-tag-en">Preprocess</div>
           </div>
-          <div class="welcome-tag tag-anomaly" @click.stop="goToModule('/app/anomaly')">
+          <div class="welcome-tag tag-anomaly" @click.stop="goToApp">
             <div class="welcome-tag-cn">异常检测</div>
             <div class="welcome-tag-en">Anomaly Detection</div>
           </div>
-          <div class="welcome-tag tag-cluster" @click.stop="goToModule('/app/cluster')">
+          <div class="welcome-tag tag-cluster" @click.stop="goToApp">
             <div class="welcome-tag-cn">聚类分析</div>
             <div class="welcome-tag-en">Clustering Analysis</div>
           </div>
-          <div class="welcome-tag tag-predict" @click.stop="goToModule('/app/predict')">
+          <div class="welcome-tag tag-predict" @click.stop="goToApp">
             <div class="welcome-tag-cn">预测分析</div>
             <div class="welcome-tag-en">Prediction Analysis</div>
           </div>
@@ -846,6 +860,14 @@ export default {
   justify-content: center;
   z-index: 20;
   cursor: pointer;
+  pointer-events: none;
+}
+
+/* 确保内部元素可以接收点击事件 */
+.welcome-tags,
+.welcome-tag,
+.welcome-card {
+  pointer-events: auto;
 }
 
 .welcome-tags {

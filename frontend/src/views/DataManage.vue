@@ -4,12 +4,12 @@
     <el-card shadow="never">
       <template #header>
         <div class="card-header">
-          <span>文件上传（每次必须上传一个数据文件 + 一个GeoJSON文件）</span>
+          <span>文件上传</span>
         </div>
       </template>
       
       <!-- 单文件上传模式 -->
-      <div v-if="uploadMode === 'single'">
+      <div>
         <el-upload
           class="upload-demo"
           drag
@@ -31,47 +31,6 @@
             </div>
           </template>
         </el-upload>
-      </div>
-      
-      <!-- 关联文件上传模式 -->
-      <div v-else>
-        <el-upload
-          class="upload-demo"
-          drag
-          action=""
-          :http-request="handleMultipleUpload"
-          :before-upload="beforeMultipleUpload"
-          :on-success="onUploadSuccess"
-          :on-error="onUploadError"
-          :multiple="true"
-          :limit="2"
-          :file-list="uploadFileList"
-        >
-          <el-icon class="el-icon--upload"><upload-filled /></el-icon>
-          <div class="el-upload__text">
-            点击或拖拽文件到此处上传关联文件
-          </div>
-          <template #tip>
-            <div class="el-upload__tip">
-              支持上传一个数据文件（CSV/Excel）和一个GeoJSON文件，建立关联关系
-            </div>
-          </template>
-        </el-upload>
-        
-        <!-- 已选择文件预览 -->
-        <div v-if="selectedFiles.length > 0" class="selected-files-preview">
-          <h4>已选择文件：</h4>
-          <div class="file-preview-list">
-            <div v-for="file in selectedFiles" :key="file.name" class="file-preview-item">
-              <div class="file-icon">{{ getFileIcon(file.name) }}</div>
-              <div class="file-info">
-                <div class="file-name">{{ file.name }}</div>
-                <div class="file-size">{{ formatFileSize(file.size) }}</div>
-              </div>
-              <div class="file-type">{{ getFileType(file.name) }}</div>
-            </div>
-          </div>
-        </div>
       </div>
     </el-card>
 
@@ -109,11 +68,6 @@
         <el-table-column label="类型" width="120">
           <template #default="scope">
             {{ getFileRole(scope.row) }}
-          </template>
-        </el-table-column>
-        <el-table-column label="关联文件" min-width="200">
-          <template #default="scope">
-            {{ getRelatedLabel(scope.row) }}
           </template>
         </el-table-column>
         <el-table-column prop="upload_time" label="上传时间" width="180">
@@ -261,8 +215,6 @@ export default {
   setup() {
     // 文件上传相关
     const uploadFileList = ref([])
-    const uploadMode = ref('multiple') // 固定为关联文件上传模式
-    const uploadSelectedFiles = ref([]) // 多文件上传时选择的文件列表
     
     // 文件列表相关
     const fileListData = ref([])
@@ -272,35 +224,10 @@ export default {
       size: 10
     })
     
-    // 组合后的显示文件列表：将成对的数据文件和 GeoJSON 文件排在一起
+    // 文件列表直接使用原始数据，按上传时间倒序排序
     const displayFileList = computed(() => {
       const files = fileListData.value || []
-      const result = []
-      const visited = new Set()
-
-      // 1. 先把有成对关系的数据文件放在前面：数据文件在上，GeoJSON 在下
-      files.forEach((f) => {
-        if (visited.has(f.id)) return
-        if (f.file_type === 'data' && f.related_geojson_id) {
-          result.push(f)
-          visited.add(f.id)
-          const geo = files.find(g => g.id === f.related_geojson_id)
-          if (geo && !visited.has(geo.id)) {
-            result.push(geo)
-            visited.add(geo.id)
-          }
-        }
-      })
-
-      // 2. 再把剩余未成对或未匹配到的文件按原顺序追加
-      files.forEach((f) => {
-        if (!visited.has(f.id)) {
-          result.push(f)
-          visited.add(f.id)
-        }
-      })
-
-      return result
+      return files
     })
 
     // 预览相关
@@ -369,49 +296,12 @@ export default {
       }
     }
 
-    // 带树形前缀的文件名显示：数据文件用 ┏━，GeoJSON 用 ┗━
-    const getFileNameWithTree = (row) => {
-      if (!row) return ''
-      const name = row.original_filename || ''
-
-      // 只有真正成对绑定的文件才加树形前缀
-      if (row.file_type === 'data' && row.related_geojson_id) {
-        return `┏━ ${name}`
-      }
-      if (row.file_type === 'geojson' && row.related_data_id) {
-        return `┗━ ${name}`
-      }
-
-      return name
-    }
-
     // 根据后端的 file_type 字段返回文件角色
     const getFileRole = (row) => {
       if (!row) return ''
       if (row.file_type === 'data') return '数据文件'
       if (row.file_type === 'geojson') return '地理边界文件'
       return '其他'
-    }
-
-    // 显示与当前文件绑定的另一端文件名称
-    const getRelatedLabel = (row) => {
-      if (!row) return '未关联'
-
-      // 数据文件绑定的 GeoJSON
-      if (row.file_type === 'data' && row.related_geojson_id) {
-        const target = fileListData.value.find(f => f.id === row.related_geojson_id)
-        if (target) return `—— ${target.original_filename}`
-        return `—— GeoJSON ID: ${row.related_geojson_id}`
-      }
-
-      // GeoJSON 文件绑定的数据文件
-      if (row.file_type === 'geojson' && row.related_data_id) {
-        const target = fileListData.value.find(f => f.id === row.related_data_id)
-        if (target) return `—— ${target.original_filename}`
-        return `—— 数据 ID: ${row.related_data_id}`
-      }
-
-      return '未关联'
     }
     
     // 单文件上传前校验
@@ -432,71 +322,11 @@ export default {
 
       // 简单前端校验：当前列表中已存在同名文件时禁止上传
       const existingNames = (fileListData.value || []).map(f => f.original_filename)
-      // 同时检查已选择但尚未上传的文件列表
-      const selectedNames = uploadSelectedFiles.value.map(f => f.name)
-      if (existingNames.includes(file.name) || selectedNames.includes(file.name)) {
+      if (existingNames.includes(file.name)) {
         ElMessage.error('已存在同名文件，请先删除或重命名后再上传')
         return false
       }
       
-      return true
-    }
-    
-    // 多文件上传前校验
-    const beforeMultipleUpload = (file) => {
-      const allowedExtensions = ['csv', 'xlsx', 'xls', 'geojson', 'json']
-      const extension = file.name.split('.').pop().toLowerCase()
-      const isAllowedType = allowedExtensions.includes(extension)
-      const isLt100M = file.size / 1024 / 1024 < 100
-
-      if (!isAllowedType) {
-        ElMessage.error('只支持CSV、Excel、GeoJSON格式文件！')
-        return false
-      }
-      if (!isLt100M) {
-        ElMessage.error('文件大小不能超过100MB！')
-        return false
-      }
-
-      // 简单前端校验：当前列表中已存在同名文件时禁止上传
-      const existingNames = (fileListData.value || []).map(f => f.original_filename)
-      // 同时检查已选择但尚未上传的文件列表
-      const selectedNames = uploadSelectedFiles.value.map(f => f.name)
-      if (existingNames.includes(file.name) || selectedNames.includes(file.name)) {
-        ElMessage.error('已存在同名文件，请先删除或重命名后再上传')
-        return false
-      }
-
-      // 已经选择了两个文件，直接禁止
-      if (uploadSelectedFiles.value.length >= 2) {
-        ElMessage.error('最多只能上传一个数据文件和一个GeoJSON文件！')
-        return false
-      }
-
-      // 判断当前文件类型（数据文件还是地理边界文件）
-      const isData = ['csv', 'xlsx', 'xls'].includes(extension)
-      const isGeo = ['geojson', 'json'].includes(extension)
-
-      // 统计已选文件中已有的类型
-      const existingTypes = uploadSelectedFiles.value.map(f => {
-        const ext = f.name.split('.').pop().toLowerCase()
-        if (['csv', 'xlsx', 'xls'].includes(ext)) return 'data'
-        if (['geojson', 'json'].includes(ext)) return 'geojson'
-        return 'other'
-      })
-
-      if (isData && existingTypes.includes('data')) {
-        ElMessage.error('只能选择一个数据文件（CSV/Excel），请先清空或重新选择。')
-        return false
-      }
-      if (isGeo && existingTypes.includes('geojson')) {
-        ElMessage.error('只能选择一个GeoJSON文件，请先清空或重新选择。')
-        return false
-      }
-
-      // 校验通过后，添加到已选择文件列表
-      uploadSelectedFiles.value.push(file)
-
       return true
     }
     
@@ -509,26 +339,6 @@ export default {
           options.onSuccess(response)
         } else {
           options.onError(new Error(response.message || '上传失败'))
-        }
-      } catch (error) {
-        options.onError(error)
-      }
-    }
-    
-    // 处理多文件上传
-    const handleMultipleUpload = async (options) => {
-      const { file } = options
-      try {
-        // 如果已经选择了2个文件，直接上传
-        if (uploadSelectedFiles.value.length === 2) {
-          const response = await api.file.uploadMultipleFiles(uploadSelectedFiles.value)
-          if (response.success) {
-            options.onSuccess(response)
-            // 清空已选择文件列表
-            uploadSelectedFiles.value = []
-          } else {
-            options.onError(new Error(response.message || '上传失败'))
-          }
         }
       } catch (error) {
         options.onError(error)
@@ -815,19 +625,13 @@ export default {
     return {
       // 文件上传
       uploadFileList,
-      uploadMode,
-      selectedFiles: uploadSelectedFiles,
       beforeUpload,
-      beforeMultipleUpload,
       handleUpload,
-      handleMultipleUpload,
       onUploadSuccess,
       onUploadError,
       getFileIcon,
       getFileType,
-      getFileNameWithTree,
       getFileRole,
-      getRelatedLabel,
       
       // 文件列表
       fileListData,

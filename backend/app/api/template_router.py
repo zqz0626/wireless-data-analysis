@@ -230,8 +230,7 @@ async def update_template(
         "type": template.type,
         "config": json.loads(template.config),
         "results": json.loads(template.results),
-        "created_at": template.created_at.isoformat(),
-        "updated_at": template.updated_at.isoformat() if template.updated_at else template.created_at.isoformat()
+        "created_at": template.created_at.isoformat()
     }
 
 
@@ -280,6 +279,5 @@ async def search_templates(
         "type": template.type,
         "config": json.loads(template.config),
         "results": json.loads(template.results),
-        "created_at": template.created_at.isoformat(),
-        "updated_at": template.updated_at.isoformat() if template.updated_at else template.created_at.isoformat()
+        "created_at": template.created_at.isoformat()
     } for template in templates]
