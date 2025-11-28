@@ -142,7 +142,7 @@ export default {
      */
     goToApp() {
       if (this.leftStage === 0 && this.rightStage === 0) {
-        this.leftStage = 3
+        this.leftStage = 4
         this.rightStage = 6
         this.checkShowFinalWelcome()
         return
@@ -653,7 +653,7 @@ export default {
   display: flex;
   flex-direction: column;
   height: calc(100% - 80px);
-  gap: 24px;
+  gap: 0;
 }
 
 .book-row {
@@ -661,8 +661,9 @@ export default {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 18px 0;
+  padding: 24px 0;
   border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  margin: 0;
 }
 
 .book-row:last-child {
@@ -743,11 +744,12 @@ export default {
   position: absolute;
   width: 100%;
   height: 100%;
-  padding: 40px 28px;
+  padding: 40px 32px;
   display: flex;
   flex-direction: column;
   text-align: center;
   overflow: hidden;
+  align-items: center;
 }
 
 /* 阶段为空时的样式 */
@@ -921,7 +923,7 @@ export default {
 .tech-stack-header {
   font-size: 1.8rem;
   font-weight: 800;
-  margin-bottom: 26px;
+  margin-bottom: 32px;
   font-family: 'Georgia', 'Times New Roman', serif;
   font-style: italic;
   letter-spacing: 0.05em;
@@ -930,90 +932,110 @@ export default {
 
 .tech-stack-header.backend-title {
   font-size: 1.8rem;
-  margin-bottom: 18px;
+  margin-bottom: 32px;
 }
 
 /* 技术栈内容样式 */
 .tech-stack-body {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
+  text-align: left;
   flex: 1;
-  justify-content: space-between;
+  justify-content: space-around;
+  height: 100%;
+  padding-right: 0;
+}
+
+.tech-section {
+  width: 100%;
   height: 100%;
 }
 
 .tech-section-content {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
   text-align: left;
   flex: 1;
-  justify-content: space-between;
+  justify-content: space-around;
+  height: 100%;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  padding-right: 0;
+}
+
+/* 统一标签样式 */
+.tech-item,
+.module-item {
+  padding: 16px 20px;
+  background: linear-gradient(135deg, rgba(250, 248, 240, 0.8), rgba(245, 230, 210, 0.6));
+  border-radius: 10px;
+  border-left: 4px solid #b76e79;
+  border-right: 1px solid rgba(183, 110, 121, 0.2);
+  border-bottom: 1px solid rgba(183, 110, 121, 0.2);
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  min-height: 70px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  width: 100%;
+  flex-shrink: 0;
+}
+
+/* 统一标签名称样式 */
+.tech-item-name,
+.module-item-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  font-family: 'Georgia', 'Times New Roman', serif;
+  font-style: italic;
+  color: #3a2f24;
+  margin-bottom: 6px;
+  width: 100%;
+  line-height: 1.2;
+  flex-shrink: 0;
+}
+
+/* 统一标签描述样式 */
+.tech-item-desc,
+.module-item-desc {
+  font-size: 0.85rem;
+  color: #5a4a3e;
+  opacity: 0.88;
+  max-width: 100%;
+  text-align: left;
+  width: 100%;
+  line-height: 1.5;
+  margin-left: 0;
+  margin-top: 0;
+  flex-shrink: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* 前端/后端技术栈标签样式 */
 .frontend-stack .tech-section-content,
 .backend-stack .tech-section-content {
-  gap: 4px;
+  gap: 12px;
   flex: 1;
-  justify-content: space-between;
-}
-
-.frontend-stack .tech-item,
-.backend-stack .tech-item {
-  padding: 22px 26px;
-  background: linear-gradient(135deg, rgba(250, 248, 240, 0.7), rgba(245, 230, 210, 0.5));
-  border-radius: 8px;
-  border-left: 4px solid #b76e79;
-  border-right: 1px solid rgba(183, 110, 121, 0.2);
-  border-bottom: 1px solid rgba(183, 110, 121, 0.2);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-}
-
-.frontend-stack .tech-item-name,
-.backend-stack .tech-item-name {
-  font-size: 1.12rem;
-  font-weight: 600;
-  color: #3a2f24;
-}
-
-.frontend-stack .tech-item-desc,
-.backend-stack .tech-item-desc {
-  font-size: 1rem;
-  color: #5a4a3e;
-  opacity: 0.85;
-}
-
-/* 技术栈项样式 */
-.tech-item {
+  justify-content: space-around;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 16px;
-  background: rgba(250, 248, 240, 0.6);
-  border-radius: 6px;
-  border-left: 4px solid #b76e79;
-  flex-shrink: 0;
-  transition: all 0.3s ease;
-}
-
-.tech-item-name {
-  font-weight: 600;
-  font-family: 'Georgia', 'Times New Roman', serif;
-  font-style: italic;
-  color: #3a2f24;
-  font-size: 1rem;
-}
-
-.tech-item-desc {
-  font-size: 0.9rem;
-  color: #5a4a3e;
-  opacity: 0.8;
-  max-width: 55%;
-  text-align: right;
-  flex: 1;
-  margin-left: 16px;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  padding-right: 0;
 }
 
 /* 模块详情页面样式 */
@@ -1026,6 +1048,21 @@ export default {
   flex-direction: column;
   text-align: center;
   overflow: hidden;
+  align-items: center;
+}
+
+.module-body {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  text-align: left;
+  flex: 1;
+  justify-content: space-around;
+  height: 100%;
+  padding-right: 0;
 }
 
 .module-header {
@@ -1036,53 +1073,17 @@ export default {
   font-style: italic;
   letter-spacing: 0.05em;
   color: #c17c7e;
-}
-
-.module-body {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  text-align: left;
-  flex: 1;
-  justify-content: space-between;
-}
-
-.module-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px 20px;
-  background: linear-gradient(135deg, rgba(250, 248, 240, 0.7), rgba(245, 230, 210, 0.5));
-  border-radius: 8px;
-  border-left: 4px solid #b76e79;
-  border-right: 1px solid rgba(183, 110, 121, 0.2);
-  border-bottom: 1px solid rgba(183, 110, 121, 0.2);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s ease;
+  text-align: center;
+  flex-shrink: 0;
 }
 
 /* 悬停效果 */
-.home-hero-right .module-item:hover,
-.home-hero-left .tech-item:hover {
+.tech-item:hover,
+.module-item:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.module-item-name {
-  font-weight: 700;
-  font-size: 1.12rem;
-  margin-bottom: 4px;
-  color: #3a2f24;
-}
-
-.module-item-desc {
-  font-size: 0.9rem;
-  opacity: 0.88;
-  color: #5a4a3e;
-  line-height: 1.55;
-  max-width: 55%;
-  text-align: right;
-  flex: 1;
-  margin-left: 16px;
+  background: linear-gradient(135deg, rgba(250, 248, 240, 0.9), rgba(245, 230, 210, 0.7));
+  border-left: 4px solid #c17c7e;
+  transition: all 0.3s ease;
 }
 </style>
