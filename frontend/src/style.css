@@ -1,0 +1,1797 @@
+/* 全局样式重置 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ================= 配置折叠区统一样式（预处理 / 聚类 / 预测 / 异常检测） ================= */
+
+/* 所有配置卡片里的 Collapse 统一样式：高度、字号、分隔线一致 */
+.config-collapse .el-collapse {
+  background: transparent !important;
+  border-radius: calc(var(--radius) - 4px);
+}
+
+.config-collapse .el-collapse-item__header {
+  padding: 18px 20px !important;
+  font-size: 1rem !important; /* 16px */
+  font-weight: 600 !important;
+  color: var(--text-primary) !important;
+  background: transparent !important;
+  border-bottom: 1px solid var(--border-color) !important;
+  align-items: center !important;
+}
+
+.config-collapse .el-collapse-item__title {
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  color: var(--text-primary) !important;
+}
+
+.config-collapse .el-collapse-item__header .el-icon {
+  font-size: 1.05rem !important;
+  color: var(--text-secondary) !important;
+}
+
+.config-collapse .el-collapse-item__wrap {
+  padding: 0 !important;
+  background-color: transparent !important;
+}
+
+.config-collapse .el-collapse-item__content {
+  padding: 18px 20px !important;
+  background: var(--page-inner-bg) !important;
+  border-bottom: 1px solid rgba(0,0,0,0.02) !important;
+  color: var(--text-secondary) !important;
+  font-size: 0.95rem !important; /* 15px */
+}
+
+/* 折叠内部内容块统一间距（如各类参数表单区） */
+.config-section {
+  padding: 14px 0 !important;
+  font-size: 0.95rem;
+}
+
+/* 统一四个分析模块主操作区域布局 */
+.action-buttons {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 0 12px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+  .action-buttons {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+}
+
+/* 统一主操作按钮样式：执行预处理 / 执行聚类 / 执行检测 / 执行预测 */
+.primary-action-btn.el-button,
+.primary-action-btn {
+  min-width: 180px;
+  height: 44px;
+  padding: 0 20px;
+  border-radius: var(--radius-md);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.primary-action-btn .el-icon {
+  font-size: 18px;
+}
+
+/* 统一四个模块“执行XXX”卡片的阴影和内边距 */
+.execute-card {
+  box-shadow: var(--shadow) !important;
+  border-radius: var(--radius-lg) !important;
+}
+
+.execute-card .el-card__header {
+  padding: 16px 24px !important;
+}
+
+.execute-card .el-card__body {
+  padding: 8px 24px 12px !important;
+}
+
+/* ----------------------------- */
+/* 强力覆盖：统一头部两个控制按钮（主题 / 退出）的所有可见样式（折叠与未折叠均适用） */
+/* 目的：保证在任何状态下两个按钮的字体、内边距、高度、圆角与悬停行为完全一致 */
+.theme-toggle-btn,
+.logout-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  padding: 0.5rem 1rem !important; /* 8px 16px */
+  font-size: 1rem !important;
+  line-height: 1 !important;
+  min-height: 40px !important;
+  height: auto !important;
+  border-radius: var(--radius) !important;
+  background: var(--surface-color) !important;
+  color: var(--text-secondary) !important;
+  border: 1px solid var(--border-color) !important;
+  box-shadow: none !important;
+  cursor: pointer !important;
+  transition: transform var(--transition), box-shadow var(--transition), background-color var(--transition), color var(--transition) !important;
+}
+
+/* 悬停/交互态一致 */
+.theme-toggle-btn:hover,
+.logout-btn:hover,
+.theme-toggle-btn:focus,
+.logout-btn:focus {
+  transform: translateY(-2px) !important;
+  box-shadow: var(--shadow) !important;
+  background-color: #f3f4f6 !important; /* 与之前 hover 行为保持一致 */
+  color: #ff4d4f !important; /* 动作色 */
+}
+
+/* Element Plus el-button 变体覆盖（确保 .el-button 注入类也被统一） */
+.theme-toggle-btn.el-button,
+.logout-btn.el-button,
+.theme-toggle-btn.el-button--primary,
+.logout-btn.el-button--primary,
+.theme-toggle-btn.el-button--mini,
+.logout-btn.el-button--mini {
+  padding: 0.5rem 1rem !important;
+  font-size: 1rem !important;
+  line-height: 1 !important;
+  min-height: 40px !important;
+  height: auto !important;
+  border-radius: var(--radius) !important;
+  background: var(--surface-color) !important;
+  color: var(--text-secondary) !important;
+  border: 1px solid var(--border-color) !important;
+  box-shadow: none !important;
+}
+
+/* 小图标位移一致性（例如下拉箭头） */
+.theme-toggle-btn.el-button .el-icon-arrow-down,
+.logout-btn .el-icon-arrow-down {
+  margin-left: 6px !important;
+}
+
+/* 确保折叠侧栏不会通过祖先选择器改变按钮尺寸：以最高优先级覆盖任何结合 collapsed 的规则 */
+.app-root .app-layout .sidebar.collapsed ~ .main-header .theme-toggle-btn,
+.app-root .app-layout .sidebar.collapsed ~ .main-header .logout-btn,
+.app-root .app-layout .sidebar.collapsed .main-header .theme-toggle-btn,
+.app-root .app-layout .sidebar.collapsed .main-header .logout-btn {
+  padding: 0.5rem 1rem !important;
+  font-size: 1rem !important;
+  min-height: 40px !important;
+}
+
+/* 结束统一覆盖 */
+
+/* CSS变量定义 - 现代化配色方案 */
+:root {
+  /* 主色调 - 暖色主题 */
+  --primary-color: #c27a3b;   /* 更柔和的暖棕橙 */
+  --primary-light: #f0b27a;   /* 柔和高亮色 */
+  --primary-dark: #8f4f22;    /* 柔和的深色用于按下态 */
+  
+  /* 辅助色 */
+  --secondary-color: #10b981;
+  --secondary-dark: #059669;  /* 辅助色深色用于按下态 */
+  --accent-color: #ffb085; /* 更柔和的次级强调色 */
+  --warning-color: #f59e0b;
+  --error-color: #ef4444;
+  --success-color: #22c55e;
+  
+  /* 中性色（改为蓝 + 绿的柔和配色） */
+  --background-color: #eaf6ff; /* 全局淡蓝外部背景 */
+  /* 页面容器与卡片色统一调整：页面内部使用浅薄薄的绿色，卡片保持白色以获得更好的对比 */
+  --surface-color: #ffffff;    /* 卡片/面板使用白色，增强卡片与底色对比 */
+  --page-inner-bg: #f3fff2;    /* 页面内部淡绿色背景（主内容区） */
+  --sidebar-bg: #eafbf0;       /* 侧边栏淡绿色（与 page-inner-bg 保持协调，但略微更柔和） */
+  --sidebar-text: #072522;     /* 侧栏高对比文字（深青/墨绿） */
+  --input-bg: #ffffff;         /* 输入框与列表行背景改为纯白 */
+  /* 备用主题（暖色）会在 .theme-warm 覆盖这些变量 */
+  --text-primary: #0b2b34;     /* 页面主文字，深色（接近墨青）以保证可读性 */
+  --text-secondary: #4e6a6c;   /* 次级文本，保持对比但不抢眼 */
+  --text-light: #9aa3a9;
+  --border-color: #efe4db;     /* 更浅更柔和的边框 */
+  --border-hover: #e0d1c6;
+  /* 更深的边框变量，供需要更高对比的元素使用（可在主题里覆盖） */
+  --border-strong: rgba(11,43,36,0.14);
+  
+  /* 阴影 */
+  /* 阴影（暖色主题下保持柔和但清晰的分层感） */
+  --shadow-sm: 0 1px 2px 0 rgb(30 22 18 / 0.04);
+  --shadow: 0 6px 12px -6px rgba(11,22,30,0.06);
+  --shadow-md: 0 10px 30px -12px rgba(11,22,30,0.08);
+  --shadow-lg: 0 18px 40px -18px rgba(11,22,30,0.12);
+  
+  /* 圆角 */
+  --radius-sm: 0.25rem;
+  --radius: 0.5rem;        /* 增大整体圆角基础值 */
+  --radius-md: 0.75rem;    /* 中等圆角 */
+  --radius-lg: 1rem;       /* 大圆角，用于卡片和重要容器 */
+  --radius-xl: 1.5rem;     /* 超大圆角，用于视觉重点 */
+  
+  /* 间距 */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing: 0.75rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+  
+  /* 过渡动画 */
+  --transition-fast: 150ms ease-in-out;
+  --transition: 200ms ease-in-out;
+  --transition-slow: 300ms ease-in-out;
+  
+  /* 字体 */
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  font-weight: 400;
+  
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+  /* 滚动条配色（可被主题覆盖） */
+  --scroll-thumb: rgba(6,40,34,0.12);
+  --scroll-thumb-hover: rgba(6,40,34,0.18);
+  --input-bg-hover: #f5f7fa;   /* 输入/控件 hover 浅灰色 */
+  /* 全局卡片间距 */
+  --card-gap: 32px;
+}
+
+/* Map Element Plus CSS variables to project theme so library components follow the theme */
+:root {
+  /* Primary color mapping for Element Plus (covers buttons, radios, checkboxes, tags) */
+  --el-color-primary: var(--primary-color);
+  --el-color-primary-hover: var(--primary-dark);
+  --el-color-primary-pressed: var(--primary-dark);
+  --el-color-primary-light: var(--primary-light);
+  /* Fallbacks for other element-plus usages */
+  --el-border-color: var(--border-color);
+  --el-color-success: var(--success-color);
+  --el-color-warning: var(--warning-color);
+  --el-color-danger: var(--error-color);
+}
+
+/* 深色模式支持 */
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* 暗色模式仍使用蓝绿基调，但略微降低明度以保持柔和 */
+    --background-color: #dff4ff; /* 深色偏好的环境下使用较浅的蓝色，以保持视觉一致 */
+    --surface-color: #e9fff4;   /* 卡片使用更浅的绿色 */
+    --text-primary: #072b2f;    /* 深色文字以保证可读性 */
+    --text-secondary: #4e6a6c;  /* 次级文本 */
+    --text-light: #bfb0a6;
+    --border-color: #2a221f;    /* 暖边框色 */
+    --border-hover: #3a2f2b;
+    /* 暗色模式下的阴影也使用暖色调半透明，帮助分层 */
+    --shadow-sm: 0 1px 2px 0 rgba(10,8,6,0.6);
+    --shadow: 0 1px 3px 0 rgba(10,8,6,0.7), 0 1px 2px -1px rgba(10,8,6,0.6);
+    --shadow-md: 0 6px 18px -6px rgba(10,8,6,0.65), 0 2px 6px -2px rgba(10,8,6,0.6);
+    --shadow-lg: 0 14px 30px -10px rgba(10,8,6,0.7), 0 6px 18px -6px rgba(10,8,6,0.65);
+  }
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background-color: var(--background-color);
+  color: var(--text-primary);
+  transition: background-color var(--transition), color var(--transition);
+}
+
+/* 全屏页面（如仪表盘）使用 body.fullscreen-page 关闭浅色背景，由子组件自己绘制整屏背景 */
+body.fullscreen-page {
+  background-color: transparent !important;
+}
+
+/* 应用容器 */
+#app {
+  width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+}
+
+/* 链接样式 */
+a {
+  color: var(--primary-light);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+  font-weight: 500;
+}
+
+a:hover, a:focus {
+  color: var(--primary-dark);
+  text-decoration: underline;
+}
+
+/* 标题样式 */
+h1, h2, h3, h4, h5, h6 {
+  margin-bottom: var(--spacing-md);
+  line-height: 1.3;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+h1 {
+  font-size: 2.5rem;
+  margin-bottom: var(--spacing-lg);
+  background: linear-gradient(to right, var(--primary-color), var(--accent-color));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+h2 {
+  font-size: 1.875rem;
+  border-bottom: 2px solid var(--primary-light);
+  padding-bottom: var(--spacing-xs);
+  display: inline-block;
+}
+
+h3 {
+  font-size: 1.5rem;
+}
+
+/* 按钮样式 */
+button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing) var(--spacing-lg);
+  font-size: 1rem;
+  font-weight: 500;
+  font-family: inherit;
+  color: white;
+  background-color: var(--primary-color);
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition);
+  outline: none;
+  box-shadow: var(--shadow-sm);
+}
+
+button:hover {
+  background-color: var(--primary-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow);
+}
+
+button:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-sm);
+}
+
+button:focus-visible {
+  box-shadow: var(--shadow), 0 0 0 3px rgba(59, 130, 246, 0.3);
+}
+
+button.secondary {
+  background-color: var(--secondary-color);
+}
+
+button.secondary:hover {
+  background-color: var(--secondary-dark);
+}
+
+button.outline {
+  background-color: transparent;
+  color: var(--primary-color);
+  border: 1px solid var(--primary-color);
+}
+
+button.outline:hover {
+  background-color: rgba(194, 122, 59, 0.05);
+}
+
+button.small {
+  padding: var(--spacing-xs) var(--spacing);
+  font-size: 0.875rem;
+}
+
+button.large {
+  padding: var(--spacing-md) var(--spacing-2xl);
+  font-size: 1.125rem;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* 卡片样式 */
+.card {
+  background-color: var(--surface-color);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  box-shadow: var(--shadow);
+  transition: box-shadow var(--transition), transform var(--transition);
+  border: 1px solid var(--border-color);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+/* 统一小模块左上角标题样式：使所有页面内卡片的标题（例如 “数据源选择” / “文件上传” / “文件列表”）
+   使用相同的字号与粗细，便于视觉一致性 */
+.card-header span,
+.page-content-inner .card-header span,
+.data-manage-container .card-header span {
+  font-size: 1.125rem !important; /* 18px */
+  font-weight: 700 !important;
+  color: var(--text-primary) !important;
+}
+
+/* ============================================
+   统一按钮样式系统 - 单一规则，无冲突
+   ============================================ */
+
+/* Element Plus 按钮基础样式 */
+:deep(.el-button) {
+  border-radius: calc(var(--radius) + 2px) !important;
+  padding: 8px 14px !important;
+  box-shadow: var(--shadow-sm) !important;
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+
+/* Primary 按钮 - 所有状态统一使用主题色 */
+:deep(.el-button--primary), .el-button--primary,
+:deep(.el-button--primary):hover, .el-button--primary:hover,
+:deep(.el-button--primary):active, .el-button--primary:active,
+:deep(.el-button--primary):focus, .el-button--primary:focus,
+:deep(.el-button--primary):focus-visible, .el-button--primary:focus-visible {
+  background-color: var(--primary-color) !important;
+  background: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
+  color: #ffffff !important;
+  background-image: none !important;
+}
+
+/* Primary 按钮交互效果 */
+:deep(.el-button--primary):hover, .el-button--primary:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: var(--shadow) !important;
+}
+
+:deep(.el-button--primary):active, .el-button--primary:active {
+  transform: translateY(0) !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+
+/* Primary 按钮特殊状态 */
+:deep(.el-button--primary.is-plain), .el-button--primary.is-plain {
+  background: transparent !important;
+  color: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
+  box-shadow: none !important;
+}
+
+:deep(.el-button--primary):disabled,
+:deep(.el-button--primary.is-disabled),
+.el-button--primary:disabled,
+.el-button--primary.is-disabled {
+  background-color: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+  box-shadow: none !important;
+}
+
+/* Focus 状态 */
+:deep(.el-button--primary):focus-visible {
+  box-shadow: 0 6px 18px -6px rgba(11,22,30,0.08), 0 0 0 6px rgba(194,122,59,0.12) !important;
+}
+
+/* ============================================
+   统一选择标签样式系统
+   ============================================ */
+
+/* 已选择项目容器样式 */
+.selected-features-display,
+.selected-models-display,
+.selected-areas-display {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+/* 全选 + 搜索 行内布局时，让复选框和搜索框之间有明显间距 */
+.select-all-container :deep(.el-checkbox) {
+  margin-right: 8px;
+}
+
+/* 已选择项目滑动条样式 */
+.selected-features-display::-webkit-scrollbar,
+.selected-models-display::-webkit-scrollbar,
+.selected-areas-display::-webkit-scrollbar {
+  width: 6px;
+}
+
+.selected-features-display::-webkit-scrollbar-track,
+.selected-models-display::-webkit-scrollbar-track,
+.selected-areas-display::-webkit-scrollbar-track {
+  background: var(--background-color);
+  border-radius: 3px;
+}
+
+.selected-features-display::-webkit-scrollbar-thumb,
+.selected-models-display::-webkit-scrollbar-thumb,
+.selected-areas-display::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 3px;
+}
+
+.selected-features-display::-webkit-scrollbar-thumb:hover,
+.selected-models-display::-webkit-scrollbar-thumb:hover,
+.selected-areas-display::-webkit-scrollbar-thumb:hover {
+  background: var(--border-hover);
+}
+
+/* 已选择项目的统一标签样式（列、地区、模型、特征等） */
+.feature-tag,
+.selected-features-display :deep(.el-tag),
+.selected-models-display :deep(.el-tag),
+.selected-areas-display :deep(.el-tag) {
+  max-width: 180px;
+  display: inline-flex;
+  align-items: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  height: 28px;
+  padding: 0 8px;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--primary-color) 8%, #ffffff 92%);
+  border: 1px solid color-mix(in srgb, var(--primary-color) 20%, #ffffff 80%);
+  color: var(--primary-color);
+  font-size: 13px;
+  font-weight: 500;
+  margin: 0 8px 8px 0;
+  transition: all var(--transition);
+}
+
+/* 统一复选项“标签”样式（用于列/地区/特征等列表上的 el-checkbox） */
+.feature-checkbox {
+  margin: 0 8px 8px 0;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* 让复选框小方块和文字之间有明确间距，避免视觉上太挤 */
+.feature-checkbox :deep(.el-checkbox__label) {
+  margin-left: 6px !important;
+}
+
+.feature-tag:hover,
+.selected-features-display :deep(.el-tag:hover),
+.selected-models-display :deep(.el-tag:hover),
+.selected-areas-display :deep(.el-tag:hover) {
+  background: color-mix(in srgb, var(--primary-color) 12%, #ffffff 88%);
+  border-color: color-mix(in srgb, var(--primary-color) 30%, #ffffff 70%);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+/* 标签关闭按钮样式 */
+.feature-tag :deep(.el-tag__close),
+.selected-features-display :deep(.el-tag__close),
+.selected-models-display :deep(.el-tag__close),
+.selected-areas-display :deep(.el-tag__close) {
+  color: var(--primary-color);
+  font-size: 14px;
+  margin-left: 4px;
+}
+
+.feature-tag :deep(.el-tag__close:hover),
+.selected-features-display :deep(.el-tag__close:hover),
+.selected-models-display :deep(.el-tag__close:hover),
+.selected-areas-display :deep(.el-tag__close:hover) {
+  background-color: color-mix(in srgb, var(--primary-color) 20%, #ffffff 80%);
+  border-radius: 50%;
+}
+
+:deep(.el-radio-button:hover) .el-radio-button__inner,
+:deep(.el-radio-button:hover) {
+  border-color: var(--primary-dark) !important;
+}
+
+:deep(.el-checkbox__input.is-checked) .el-checkbox__inner,
+:deep(.el-checkbox__input.is-checked) .el-checkbox__inner::after {
+  background-color: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
+}
+
+/* Tags (info type) used for selected features */
+:deep(.el-tag--info), :deep(.el-tag) {
+  color: var(--primary-color) !important;
+  background: rgba(194,122,59,0.08) !important; /* use a faint tint of primary */
+  border: 1px solid rgba(194,122,59,0.12) !important;
+}
+
+/* Ensure small radio/checkbox inner elements also reflect theme when active */
+:deep(.el-radio-button.is-active) .el-radio-button__original,
+:deep(.el-checkbox__input.is-checked) .el-checkbox__inner {
+  background-color: var(--primary-color) !important;
+}
+
+:deep(.el-button--default) {
+  background: white !important;
+  color: var(--text-primary) !important;
+  border: 1px solid rgba(0,0,0,0.06) !important;
+}
+
+:deep(.el-button:disabled),
+:deep(.el-button.is-disabled) {
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+  box-shadow: none !important;
+}
+
+/* 强制为 Element Plus 组件设置统一圆角及统一面色（覆盖默认/平台样式） */
+:deep(.el-card),
+:deep(.el-upload-dragger),
+:deep(.el-upload) {
+  border-radius: var(--radius-lg) !important;
+  /* 对卡片和上传拖拽区保留裁剪（圆角） */
+  overflow: hidden;
+  background: var(--surface-color) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+/* 对描述、表格等内容容器只设置面色和圆角，但允许内部滚动显示 */
+:deep(.el-descriptions),
+:deep(.el-table),
+:deep(.el-table__container) {
+  border-radius: var(--radius-lg) !important;
+  background: var(--surface-color) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+  overflow: visible !important; /* 允许子容器自己处理滚动 */
+}
+
+/* 表格头部和表体片段允许滚动，防止滚动条被隐藏 */
+:deep(.el-table__header-wrapper),
+:deep(.el-table__body-wrapper) {
+  border-radius: var(--radius-lg) !important;
+  background: var(--surface-color) !important;
+  overflow: auto !important;
+}
+
+/* 侧边栏样式：使用淡绿色背景并提高文字/图标对比 */
+.app-sider,
+.app-sidebar,
+.el-aside,
+.layout-sider,
+.sidebar {
+  background: var(--sidebar-bg) !important;
+  color: var(--sidebar-text) !important;
+  border-right: 1px solid rgba(11,43,36,0.06);
+}
+
+/* 更高优先级的覆盖：针对 AppLayout 中的侧栏元素（覆盖 scoped styles） */
+.app-root .app-layout .sidebar {
+  background: var(--sidebar-bg) !important;
+  color: var(--sidebar-text) !important;
+  box-shadow: none !important;
+  position: relative; /* 保证可控的 z-index 叠放 */
+  z-index: 10; /* 默认侧栏位于主内容之下，顶栏可覆盖在上方 */
+  /* 整体大框边线，使用主题化的更深边框颜色 */
+  border: 1px solid var(--border-strong, rgba(11,43,36,0.12)) !important;
+  border-radius: 10px !important;
+  overflow: hidden; /* 保证圆角裁剪内部元素 */
+}
+
+/* 折叠态保持右侧对齐的视觉（避免双重边线） */
+.app-root .app-layout .sidebar.collapsed {
+  border-right-width: 1px !important;
+}
+
+.app-root .app-layout .sidebar .nav-item {
+  color: var(--sidebar-text) !important;
+  background: transparent !important;
+}
+
+.app-root .app-layout .sidebar .nav-item:hover {
+  background-color: rgba(6,40,34,0.06) !important;
+  color: var(--sidebar-text) !important;
+}
+
+.app-root .app-layout .sidebar .nav-item.active {
+  background-color: rgba(6,40,34,0.12) !important; /* 更明显但仍温和 */
+  color: var(--sidebar-text) !important;
+  box-shadow: none !important;
+}
+
+/* 调整图标颜色和尺寸在侧栏内的表现 */
+.app-root .app-layout .sidebar .nav-item el-icon,
+.app-root .app-layout .sidebar .nav-item > el-icon {
+  color: var(--sidebar-text) !important;
+  font-size: 1.05rem !important;
+}
+
+/* 更显著的侧边栏激活指示：左侧彩色标记 */
+.app-root .app-layout .sidebar .nav-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 8px;
+  bottom: 8px;
+  width: 6px;
+  border-top-right-radius: 6px;
+  border-bottom-right-radius: 6px;
+  background: linear-gradient(180deg, var(--primary-color), var(--primary-dark));
+}
+
+/* 让侧栏项为相对定位以容纳 ::before 指示器 */
+.app-root .app-layout .sidebar .nav-item {
+  position: relative;
+  padding-left: 1.5rem !important;
+}
+
+/* 侧栏折叠状态：仅显示图标，隐藏文字 */
+.sidebar.collapsed {
+  width: 72px !important;
+}
+
+.sidebar.collapsed .nav-item {
+  justify-content: center;
+  padding-left: 0.5rem !important;
+}
+
+.sidebar.collapsed .nav-item span {
+  display: none !important;
+}
+
+.sidebar.collapsed .nav-item el-icon,
+.sidebar.collapsed .nav-item > el-icon {
+  margin-right: 0 !important;
+}
+
+/* 折叠态下的激活项：底部小圆点指示（居中） */
+.app-root .app-layout .sidebar.collapsed .nav-item.active::after {
+  /* 使用底部横线作为激活指示（取代圆点） */
+  content: '';
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 8px;
+  width: 36px;
+  height: 5px;
+  background: linear-gradient(90deg, var(--primary-light), var(--primary-color));
+  border-radius: 4px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.18);
+}
+
+/* 隐藏之前的 ::before 标记以避免叠加 */
+.app-root .app-layout .sidebar.collapsed .nav-item.active::before {
+  display: none !important;
+}
+
+/* --- Collapsed sidebar visual refresh --- */
+/* Make collapsed sidebar look cleaner: center icons in circular chips,
+   use a subtle gradient circle for active icons and keep a small bottom
+   indicator bar. Add smooth transitions for hover/active states. */
+.app-root .app-layout .sidebar.collapsed {
+  width: 76px !important; /* slightly larger so circular chips breathe */
+  padding-top: 12px !important;
+  padding-bottom: 12px !important;
+}
+
+.app-root .app-layout .sidebar.collapsed .nav-item {
+  position: relative !important; /* for ::after */
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 56px !important;
+  height: 56px !important;
+  margin: 10px auto !important;
+  border-radius: 12px !important;
+  background: transparent !important;
+  transition: background-color 200ms ease, transform 200ms ease;
+}
+
+.app-root .app-layout .sidebar.collapsed .nav-item:hover {
+  transform: translateY(-2px);
+  background: rgba(0,0,0,0.03) !important;
+}
+
+.app-root .app-layout .sidebar.collapsed .nav-item > el-icon,
+.app-root .app-layout .sidebar.collapsed .nav-item > .el-icon {
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 999px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: background 200ms ease, color 200ms ease, box-shadow 200ms ease;
+}
+
+.app-root .app-layout .sidebar.collapsed .nav-item.active > el-icon,
+.app-root .app-layout .sidebar.collapsed .nav-item.active > .el-icon {
+  /* Outline/ring style instead of filled gradient for a cleaner look */
+  background: transparent !important;
+  color: var(--primary-color) !important;
+  border: 2px solid var(--primary-color) !important;
+  box-shadow: 0 6px 14px rgba(18,40,30,0.06) !important;
+}
+
+/* Keep a subtle separator when collapsed but avoid heavy box border */
+.app-root .app-layout .sidebar.collapsed {
+  border: 1px solid rgba(0,0,0,0.04) !important;
+}
+
+/* Reduce clutter: hide left full-width active background when collapsed */
+.app-root .app-layout .sidebar.collapsed .nav-item.active {
+  background: transparent !important;
+}
+
+/* 主题：暖色变体（覆盖变量） */
+.theme-warm {
+  --primary-color: #d68a4a;
+  --primary-light: #f7c89a;
+  --primary-dark: #9a4f1f;
+  --background-color: #fff7ee;
+  --surface-color: #fffdf8;
+  --page-inner-bg: #fff9f0;
+  --sidebar-bg: #fff6ea;
+  --sidebar-text: #3b2a1f;
+  --input-bg: #ffffff;
+}
+
+/* 预设多个主题（名字长度相等，便于布局显示）：Spring, Summer, Autumn, Winter, Aurora */
+.theme-spring {
+  --primary-color: #4caf50;
+  --primary-light: #a5d6a7;
+  --primary-dark: #2e7d32;
+  --background-color: #f0fbf4;
+  --surface-color: #ffffff;
+  --page-inner-bg: #f7fff7;
+  --sidebar-bg: #eafbf0;
+  --sidebar-text: #054f2d;
+  --input-bg: #ffffff;
+  --border-color: rgba(4, 40, 34, 0.06);
+}
+
+.theme-summer {
+  --primary-color: #0288d1;
+  --primary-light: #81d4fa;
+  --primary-dark: #01579b;
+  --background-color: #e9f6ff;
+  --surface-color: #ffffff;
+  --page-inner-bg: #f3fbff;
+  --sidebar-bg: #eaf6ff;
+  --sidebar-text: #073a57;
+  --input-bg: #ffffff;
+  --border-color: rgba(2, 88, 209, 0.06);
+}
+
+.theme-autumn {
+  --primary-color: #d97706;
+  --primary-light: #ffd29a;
+  --primary-dark: #8a4a03;
+  --background-color: #fff6ef;
+  --surface-color: #ffffff;
+  --page-inner-bg: #fff9f2;
+  --sidebar-bg: #fff7ec;
+  --sidebar-text: #4b2b00;
+  --input-bg: #ffffff;
+  --border-color: rgba(217,119,6,0.06);
+}
+
+.theme-winter {
+  --primary-color: #6b7280;
+  --primary-light: #c7ccd1;
+  --primary-dark: #374151;
+  --background-color: #f6f9fb;
+  --surface-color: #ffffff;
+  --page-inner-bg: #f8fbfd;
+  --sidebar-bg: #f2f69;
+  --sidebar-text: #0f1724;
+  --input-bg: #ffffff;
+  --border-color: rgba(15,23,36,0.06);
+}
+
+.theme-aurora {
+  --primary-color: #8e44ad;
+  --primary-light: #d7b6e6;
+  --primary-dark: #5b2a7a;
+  --background-color: #fbf7ff;
+  --surface-color: #ffffff;
+  --page-inner-bg: #fcf8ff;
+  --sidebar-bg: #fbf4ff;
+  --sidebar-text: #3b0f43;
+  --input-bg: #ffffff;
+  --border-color: rgba(142,68,173,0.06);
+}
+
+/* 小的主题选项色块（用于下拉菜单） */
+.theme-swatch { display:inline-block; width:22px; height:14px; border-radius:6px; margin-right:8px; vertical-align:middle; box-shadow:0 1px 2px rgba(0,0,0,0.06);} 
+.sw-spring{background:linear-gradient(90deg,#b9f6ca,#4caf50);} 
+.sw-summer{background:linear-gradient(90deg,#81d4fa,#0288d1);} 
+.sw-autumn{background:linear-gradient(90deg,#ffd29a,#d97706);} 
+.sw-winter{background:linear-gradient(90deg,#c7ccd1,#6b7280);} 
+.sw-aurora{background:linear-gradient(90deg,#d7b6e6,#8e44ad);} 
+
+/* 下拉主题选项样式：圆角并与主题配色一致（swatch显示主题色） */
+.theme-option { border-radius: 10px; padding: 8px 12px; display:flex; align-items:center; gap:8px; }
+
+
+/* 更明显的侧栏激活指示器（改良为深色条并带轻微阴影） */
+.app-root .app-layout .sidebar .nav-item.active::before {
+  background: linear-gradient(180deg, var(--primary-color), var(--primary-dark));
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+/* 侧栏样式变种：背景高亮（覆盖左侧竖条） */
+.sidebar-variant-bg .app-root .app-layout .sidebar .nav-item.active {
+  background: rgba(6,40,34,0.14) !important;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.02);
+}
+
+.sidebar-variant-bg .app-root .app-layout .sidebar .nav-item.active::before {
+  display: none !important;
+}
+
+/* Override: 让侧边栏项填充侧栏宽度并让激活项使用整行背景（优先级高） */
+.app-root .app-layout .sidebar .nav-item {
+  margin: 8px 12px !important;
+  height: 56px !important;
+  align-items: center !important;
+  width: calc(100% - 24px) !important;
+  box-sizing: border-box !important;
+  padding-left: 14px !important;
+  padding-right: 14px !important;
+  border-radius: 14px !important;
+}
+
+.app-root .app-layout .sidebar .nav-item.active::before {
+  display: none !important;
+}
+
+.app-root .app-layout .sidebar .nav-item.active {
+  background: rgba(6,40,34,0.12) !important;
+  color: var(--sidebar-text) !important;
+  border-radius: 12px !important;
+}
+
+.app-root .app-layout .sidebar .nav-item el-icon,
+.app-root .app-layout .sidebar .nav-item > el-icon {
+  margin-left: 6px !important;
+  margin-right: 12px !important;
+}
+
+.app-root .app-layout .sidebar .nav-item span {
+  display: block !important;
+  flex: 1 1 auto !important;
+}
+
+/* 折叠态：隐藏文本并让图标居中 */
+.app-root .app-layout .sidebar.collapsed .nav-item {
+  width: 56px !important;
+  height: 56px !important;
+  margin: 8px auto !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  justify-content: center !important;
+  border-radius: 14px !important;
+}
+.app-root .app-layout .sidebar.collapsed .nav-item span {
+  display: none !important;
+}
+.app-root .app-layout .sidebar.collapsed .nav-item el-icon,
+.app-root .app-layout .sidebar.collapsed .nav-item > el-icon {
+  margin: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 24px !important;
+  height: 24px !important;
+}
+
+/* 可访问性：聚焦态更明显 */
+:focus {
+  outline: 3px solid rgba(11,122,150,0.12);
+  outline-offset: 2px;
+}
+
+/* 表格 hover/选中与行间距优化 */
+:deep(.el-table) {
+  border-radius: var(--radius-lg) !important;
+  overflow: hidden;
+}
+
+:deep(.el-table td),
+:deep(.el-table th) {
+  padding: 12px 16px !important;
+}
+
+:deep(.el-table__row):hover {
+  background: rgba(255,250,200,0.95) !important;
+}
+
+/* 表单控件微调：更一致的高度与圆角 */
+:deep(.el-input__inner),
+:deep(.el-select .el-input__inner),
+:deep(.el-textarea__inner) {
+  height: 40px !important;
+  padding: 8px 12px !important;
+  border-radius: calc(var(--radius) + 2px) !important;
+}
+
+/* 全局小型控件（icon-only 按钮）统一 */
+:deep(.icon-btn) {
+  width: 36px !important;
+  height: 36px !important;
+  padding: 6px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 8px !important;
+}
+
+/* 卡片内距统一与更柔和的分割 */
+.page-content-inner :deep(.el-card) {
+  padding: 18px !important;
+  border-radius: var(--radius-lg) !important;
+}
+
+/* 侧栏内菜单项与图标 */
+:deep(.el-menu--vertical),
+:deep(.el-menu)--vertical {
+  background: transparent !important;
+}
+
+:deep(.el-menu-item) {
+  color: var(--sidebar-text) !important;
+}
+
+:deep(.el-menu-item.is-active),
+.app-sider :deep(.el-menu-item.is-active) {
+  background: rgba(6,40,34,0.08) !important; /* 轻微高亮，和侧栏色系一致 */
+  color: var(--sidebar-text) !important;
+}
+
+/* 顶部主标题 / 头部区域改为全局淡蓝色背景以统一外部背景 */
+.main-header,
+.app-header,
+header,
+.topbar {
+  background: var(--background-color) !important;
+  color: var(--text-primary) !important;
+  border-bottom: 1px solid rgba(11,43,36,0.06);
+  position: relative; /* 允许设置 z-index */
+  z-index: 20; /* 确保顶栏在侧栏之上，避免冲突 */
+}
+
+/* Header 内部右侧控件排列优化 */
+.main-header .header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* 将页面标题与侧栏收缩图标放在同一行靠左显示
+   规则：当 header 存在时，把页面内的 h2 放到 header 的左侧区域，
+   紧挨着侧栏图标（使用 left 值对齐），并垂直居中。使用高优先级
+   覆盖以确保样式生效。 */
+.main-header .page-title,
+.main-header h2,
+.main-header .view-title h2,
+.main-header .page-container h2 {
+  position: absolute !important;
+  left: 64px !important; /* 与侧栏图标右侧对齐，若侧栏折叠可微调 */
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  font-size: 1.25rem !important; /* 合适的标题大小，和图标一行时不显突兀 */
+  font-weight: 800 !important;
+  color: var(--primary-color) !important;
+  z-index: 25 !important;
+  display: block !important;
+}
+
+/* 当侧栏收缩时，左侧空间更小，向右微调使标题与图标保持合理间距 */
+.sidebar.collapsed ~ .main-header .page-title,
+.app-root .app-layout .sidebar.collapsed ~ .main-header .page-title,
+.sidebar.collapsed ~ .main-header h2 {
+  left: 56px !important;
+  font-size: 1.1rem !important;
+}
+
+/* 移动端：恢复标题文档流，避免遮挡 */
+@media (max-width: 768px) {
+  .main-header .page-title,
+  .main-header h2,
+  .main-header .view-title h2 {
+    position: static !important;
+    transform: none !important;
+    font-size: 1.6rem !important;
+    margin-left: 0 !important;
+  }
+}
+
+
+/* 头部小组件统一风格：随背景/主题变化的 chip 样式 */
+.header-chip,
+.theme-toggle-btn,
+.sidebar-variant-select,
+.logout-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: var(--surface-color);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: transform var(--transition), box-shadow var(--transition), background-color var(--transition);
+}
+.theme-toggle-btn { padding: 0.5rem 1rem; }
+.sidebar-variant-select { padding: 8px 10px; appearance: none; box-shadow: none; }
+.logout-btn { padding: 6px 10px; color: var(--text-secondary); box-shadow: none; }
+
+.theme-toggle-btn {
+  /* 使主题按钮与右侧“退出应用”在字体、大小与交互上保持一致 */
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 0.5rem 1rem !important; /* 与 .logout-btn 保持一致（0.5rem = 8px） */
+  font-size: 1rem !important; /* 明确与 .logout-btn 保持相同字体大小 */
+  line-height: 1 !important;
+  background: var(--surface-color) !important;
+  color: var(--text-secondary) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: var(--radius) !important;
+  box-shadow: none !important;
+  cursor: pointer !important;
+  transition: transform var(--transition), box-shadow var(--transition), background-color var(--transition), color var(--transition);
+  min-height: 40px !important;
+}
+.theme-toggle-btn:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: var(--shadow) !important;
+  background-color: #f3f4f6 !important; /* 与 .logout-btn:hover 一致的浅灰背景 */
+  color: #ff4d4f !important; /* 与 .logout-btn:hover 一致的动作色 */
+}
+
+/* 覆盖 Element Plus el-button 的 primary/mini 样式，仅针对 theme-toggle-btn。
+   让主题按钮看起来与 .logout-btn 完全一致（字体、内边距、边框、hover 行为）。 */
+.theme-toggle-btn.el-button,
+.theme-toggle-btn.el-button--primary,
+.theme-toggle-btn.el-button--mini {
+  background: var(--surface-color) !important;
+  color: var(--text-secondary) !important;
+  border: 1px solid var(--border-color) !important;
+  box-shadow: none !important;
+  padding: 0.5rem 1rem !important;
+  font-size: 1rem !important;
+  line-height: 1 !important;
+  height: auto !important;
+  min-height: 40px !important;
+  border-radius: var(--radius) !important;
+}
+.theme-toggle-btn.el-button .el-icon-arrow-down {
+  margin-left: 6px !important;
+}
+.theme-toggle-btn.el-button:hover,
+.theme-toggle-btn.el-button--primary:hover,
+.theme-toggle-btn.el-button--mini:hover {
+  background-color: #f3f4f6 !important;
+  color: #ff4d4f !important;
+  transform: translateY(-2px) !important;
+  box-shadow: var(--shadow) !important;
+}
+
+/* 其他头部控件使用平面 chip 风格（无渐变） */
+.sidebar-variant-select,
+.logout-btn,
+.header-chip {
+  background: var(--surface-color) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-color) !important;
+  box-shadow: none;
+}
+
+.theme-toggle-btn:hover,
+.sidebar-variant-select:hover,
+.logout-btn:hover,
+.header-chip:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+  background: var(--page-inner-bg);
+  color: var(--text-primary);
+}
+
+/* 在顶部右侧控件处加入小的 visual separation */
+.main-header .header-right > *:not(:last-child) { margin-right: 6px; }
+
+/* 表单样式 */
+/* 让原生 input/select 和 Element Plus 输入控件使用各自默认样式，
+   不再强制覆盖背景颜色，避免出现统一的色条 */
+
+/* 额外覆盖：搜索框、选择框展开前端显示区与上传拖拽区一律使用浅黄色背景 */
+input[type="search"],
+.search-box,
+.search-input,
+:deep(.el-input__inner),
+:deep(.el-select .el-input__inner),
+/* 删除对 Element Plus 输入/上传组件背景色的统一覆盖，
+   保留库自身的默认配色 */
+
+/* 搜索框需要保持原始白色背景，优先级较高以覆盖通用输入背景 */
+input[type="search"],
+.search-box,
+.search-input,
+:deep(.search .el-input__inner),
+:deep(.el-input--search .el-input__inner) {
+  background-color: #ffffff !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-color) !important;
+}
+
+/* 进一步加强覆盖：针对页面内可能的搜索控件样式 */
+.page-content-inner input[type="search"],
+.page-container input[type="search"],
+:deep(.el-input--suffix) :deep(.el-input__inner),
+:deep(.el-input--prefix) :deep(.el-input__inner),
+:deep(.el-input--mini) :deep(.el-input__inner),
+:deep(.el-input__inner[role="search"]) {
+  background-color: #ffffff !important;
+  color: var(--text-primary) !important;
+}
+
+/* 不再统一修改 el-select 下拉、上传拖拽等组件的背景色，
+   交由 Element Plus 自身样式与主题变量控制 */
+
+/* 将截图中表格/列表类型的行设为淡黄色（页面内常见容器都覆盖，避免局部白色行） */
+/* 默认（page-content-inner） */
+.page-content-inner :deep(.el-table__row),
+.page-content-inner :deep(.el-table tbody tr),
+.page-content-inner table tr,
+.page-content-inner .file-list-row,
+.page-content-inner .list-row,
+/* DataManage 页面（单独覆盖，确保文件列表也生效） */
+.data-manage-container :deep(.el-table__row),
+.data-manage-container :deep(.el-table tbody tr),
+.data-manage-container table tr,
+.data-manage-container .file-list-row,
+.data-manage-container .list-row {
+  background: var(--input-bg) !important;
+  color: var(--text-primary) !important;
+}
+
+/* 表格单元格和行 hover 状态（同样覆盖 DataManage） */
+.page-content-inner :deep(.el-table__row):hover,
+.page-content-inner table tr:hover,
+.page-content-inner .file-list-row:hover,
+.data-manage-container :deep(.el-table__row):hover,
+.data-manage-container table tr:hover,
+.data-manage-container .file-list-row:hover {
+  background: rgba(255,250,200,0.95) !important; /* 略微加深以提示交互 */
+}
+
+/* 如果某些表格/列表有白色分隔行，确保边框仍然可见 */
+.page-content-inner :deep(.el-table) td,
+.page-content-inner table td {
+  border-bottom: 1px solid rgba(0,0,0,0.04) !important;
+}
+
+/* 工具类 */
+.text-center {
+  text-align: center;
+}
+
+.text-left {
+  text-align: left;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.gap-sm {
+  gap: var(--spacing-sm);
+}
+
+.gap {
+  gap: var(--spacing);
+}
+
+.gap-md {
+  gap: var(--spacing-md);
+}
+
+.gap-lg {
+  gap: var(--spacing-lg);
+}
+
+.mt-sm {
+  margin-top: var(--spacing-sm);
+}
+
+.mt {
+  margin-top: var(--spacing);
+}
+
+.mt-md {
+  margin-top: var(--spacing-md);
+}
+
+.mt-lg {
+  margin-top: var(--spacing-lg);
+}
+
+.mb-sm {
+  margin-bottom: var(--spacing-sm);
+}
+
+.mb {
+  margin-bottom: var(--spacing);
+}
+
+.mb-md {
+  margin-bottom: var(--spacing-md);
+}
+
+.mb-lg {
+  margin-bottom: var(--spacing-lg);
+}
+
+.p-sm {
+  padding: var(--spacing-sm);
+}
+
+.p {
+  padding: var(--spacing);
+}
+
+.p-md {
+  padding: var(--spacing-md);
+}
+
+.p-lg {
+  padding: var(--spacing-lg);
+}
+
+/* 加载动画 */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 0.8s linear infinite;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  h1 {
+    font-size: 2rem;
+  }
+  
+  h2 {
+    font-size: 1.5rem;
+  }
+  
+  h3 {
+    font-size: 1.25rem;
+  }
+  
+  .card {
+    padding: var(--spacing-lg);
+  }
+  
+  .flex {
+    flex-direction: column;
+  }
+}
+
+/* 滚动条美化：颜色与整体背景/主题协调 */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background-color);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--scroll-thumb);
+  border-radius: 6px;
+  border: 2px solid var(--background-color);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--scroll-thumb-hover);
+}
+
+/* 淡入动画 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn var(--transition-slow) ease-out;
+}
+
+/* 悬浮效果 */
+.hover-lift {
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+
+.hover-lift:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* 页面内容器背景：将页面内区域设为淡绿色，和整体奶油色外部背景形成温和对比 */
+.page-container,
+.page-content-inner,
+.main-header,
+#app > .page {
+  background: var(--page-inner-bg) !important;
+  position: relative; /* allow absolutely positioned elements (titles) inside */
+}
+
+/* 确保页面内内容可滚动（避免被某些组件的 overflow:hidden 隐藏滚动条） */
+.page-content-inner {
+  overflow: auto;
+}
+
+/* 将页面主标题移动到页面顶部（靠近侧栏收缩图标），并确保在侧栏展开/收缩时位置自适应 */
+.page-container h2,
+.page-content-inner h2,
+.data-manage-container h2,
+.main-content h2,
+.view-title h2,
+.page h2 {
+  position: absolute !important;
+  top: 18px !important;           /* 距离顶部，和 header 较为靠近 */
+  left: 96px !important;         /* 默认在侧栏右侧（侧栏展开时） */
+  font-size: 2rem !important;    /* 合适大小，显眼但不抢占 */
+  font-weight: 800 !important;
+  color: var(--primary-color) !important; /* 主题色 */
+  margin: 0 !important;
+  padding: 0 !important;
+  z-index: 15 !important;
+  display: block !important;
+}
+
+/* 侧栏收缩时（更窄的 left） */
+.sidebar.collapsed ~ .page-container h2,
+.app-root .app-layout .sidebar.collapsed ~ .page-container h2,
+.sidebar.collapsed + .page-content-inner h2,
+.sidebar.collapsed ~ .main-content h2 {
+  left: 84px !important;        /* 紧邻折叠侧栏图标右侧 */
+  top: 14px !important;
+  font-size: 1.25rem !important; /* 收缩时字号更小，避免拥挤 */
+}
+
+@media (max-width: 768px) {
+  .page-container h2,
+  .page-content-inner h2,
+  .data-manage-container h2,
+  .main-content h2,
+  .view-title h2,
+  .page h2 {
+    position: static !important; /* 移回文档流，避免遮挡移动端布局 */
+    font-size: 1.75rem !important;
+    margin-bottom: var(--spacing-md) !important;
+  }
+}
+
+/* 全局卡片间距：适用于常见页面容器下的 el-card，窄屏时减小 */
+.page-container .el-card,
+.page-content-inner .el-card,
+.data-manage-container .el-card,
+.main-content .el-card {
+  margin-bottom: var(--card-gap) !important;
+}
+
+@media (max-width: 768px) {
+  :root { --card-gap: 16px; }
+}
+
+/* --------------------------- */
+/* Debug helpers removed. If you need visual debug aids in future, re-add
+   the temporary styles under a `.debug-bg` class in this file. */
+
+
+/* Firefox 滚动条样式 */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scroll-thumb) var(--background-color);
+}
+
+/* === 强制覆盖：针对文件预览（Dialog）头部、表头与分页残留紫/蓝色样式 === */
+/* 这些规则尽量限定在页面内容区（.page-content-inner）内生效，使用更具体选择器和 !important 提高优先级 */
+
+/* Dialog header 背景去紫并使用主题浅色 */
+.page-content-inner :deep(.el-dialog__header),
+.page-content-inner :deep(.el-dialog__header)[role] {
+  background: linear-gradient(90deg, rgba(194,122,59,0.06), rgba(255,255,255,0.02)) !important;
+  color: var(--text-primary) !important;
+  border-bottom: 1px solid rgba(11,43,36,0.03) !important;
+}
+
+/* 防止 Element Plus 或主题变量在 header 上注入紫色背景（强制覆盖） */
+.page-content-inner :deep(.el-dialog__header) .el-dialog__title,
+.page-content-inner :deep(.el-dialog__header) h3 {
+  color: var(--text-primary) !important;
+  font-weight: 700 !important;
+}
+
+/* 关闭按钮：白底圆形，去除紫色阴影 */
+.page-content-inner :deep(.el-dialog__headerbtn) {
+  background: #fff !important;
+  border-radius: 999px !important;
+  width: 40px !important;
+  height: 40px !important;
+  box-shadow: var(--shadow-sm) !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+/* 表格表头：去掉紫色 tint，使用非常浅的主题色 */
+.page-content-inner :deep(.el-table__header-wrapper) th,
+.page-content-inner :deep(.el-table__header-wrapper) thead th {
+  background: linear-gradient(90deg, rgba(194,122,59,0.04), rgba(255,255,255,0)) !important;
+  color: var(--text-primary) !important;
+  font-weight: 600 !important;
+}
+
+/* 分页：确保当前页、高亮与箭头使用主题色（覆盖蓝/紫） */
+.page-content-inner :deep(.el-pagination .el-pager li.is-current),
+.page-content-inner :deep(.el-pagination .el-pager li.is-current a),
+.page-content-inner :deep(.el-pagination .el-pager li.is-current a:link),
+.page-content-inner :deep(.el-pagination .el-pager li.is-current a:hover) {
+  background: var(--primary-color) !important;
+  color: #fff !important;
+  border-color: var(--primary-color) !important;
+}
+
+/* 分页箭头（图标）强制使用主题色 */
+.page-content-inner :deep(.el-pagination) :deep(.el-icon) {
+  color: var(--primary-color) !important;
+}
+
+/* 如果分页使用了 .number/.is-active 等类，再覆盖一次以保险 */
+.page-content-inner :deep(.el-pagination .number.is-active),
+.page-content-inner :deep(.el-pagination .pager .number.is-active) {
+  background: var(--primary-color) !important;
+  color: #fff !important;
+  border-color: var(--primary-color) !important;
+}
+
+/* 某些版本会给 el-button 添加强样式，针对弹窗内的 primary button 再覆盖一次 */
+.page-content-inner :deep(.el-dialog) :deep(.el-button--primary),
+.page-content-inner :deep(.el-dialog) :deep(.el-button--primary.is-plain) {
+  background-color: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
+  color: #fff !important;
+}
+
+/* 若 radio-button 内层仍为蓝色，强制覆盖（限制在 page-content-inner 中） */
+.page-content-inner :deep(.el-radio-button.is-active) .el-radio-button__inner,
+.page-content-inner :deep(.el-radio-button.is-active) {
+  background-color: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
+  color: #fff !important;
+}
+
+/* 小屏幕下的分页/表头调整，避免颜色被外部样式覆盖 */
+@media (max-width: 768px) {
+  .page-content-inner :deep(.el-pagination .el-pager li.is-current) {
+    background: var(--primary-color) !important;
+    color: #fff !important;
+  }
+}
+
+/* End forced preview overrides */
+
+/* === Global fallback overrides ===
+   Some Element Plus components (Dialog) are teleported to <body> so
+   selectors scoped under .page-content-inner may not match. Add global,
+   high-specificity fallbacks to ensure dialog header, pagination and
+   radio/button visuals follow the project's primary theme color.
+   These are deliberately narrow and use !important to override library
+   defaults when necessary.
+*/
+
+/* Dialog header (global) */
+:deep(.el-dialog__header),
+.el-dialog__header {
+  background: linear-gradient(90deg, rgba(194,122,59,0.06), rgba(255,255,255,0.02)) !important;
+  color: var(--text-primary) !important;
+  border-bottom: 1px solid rgba(11,43,36,0.03) !important;
+}
+
+/* Dialog title and close button */
+.el-dialog__header .el-dialog__title,
+.el-dialog__header h3 {
+  color: var(--text-primary) !important;
+  font-weight: 700 !important;
+}
+.el-dialog__headerbtn {
+  background: #fff !important;
+  border-radius: 999px !important;
+  width: 40px !important;
+  height: 40px !important;
+  box-shadow: var(--shadow-sm) !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Table header (global) */
+:deep(.el-table__header-wrapper) th,
+.el-table__header-wrapper th {
+  background: linear-gradient(90deg, rgba(194,122,59,0.04), rgba(255,255,255,0)) !important;
+  color: var(--text-primary) !important;
+  font-weight: 600 !important;
+}
+
+/* Pagination (global) */
+.el-pagination .el-pager li.is-current,
+.el-pagination .el-pager li.is-current a,
+.el-pagination .el-pager li.is-current a:link,
+.el-pagination .el-pager li.is-current a:hover {
+  background: var(--primary-color) !important;
+  color: #fff !important;
+  border-color: var(--primary-color) !important;
+}
+.el-pagination .el-icon {
+  color: var(--primary-color) !important;
+}
+
+/* Dialog-scoped primary buttons (global fallback) */
+.el-dialog .el-button--primary,
+.el-dialog .el-button--primary.is-plain {
+  background-color: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
+  color: #fff !important;
+}
+
+/* === MessageBox / Confirm 对话框 专用美化 === */
+/* 针对 ElMessageBox (Element Plus) 的确认对话框做视觉优化，
+   使用项目主色，提升按钮对比，调整内边距与圆角，让确认态更明显且不使用默认紫色。 */
+.el-message-box__wrapper {
+  z-index: 2000 !important;
+}
+.el-message-box__header {
+  background: linear-gradient(90deg, rgba(194,122,59,0.06), rgba(255,255,255,0.02)) !important;
+  padding: 16px 20px !important;
+}
+.el-message-box__title {
+  color: var(--text-primary) !important;
+  font-weight: 700 !important;
+  font-size: 18px !important;
+}
+.el-message-box__content {
+  padding: 18px 22px !important;
+  color: var(--text-secondary) !important;
+  font-size: 14px !important;
+}
+
+/* 按钮组：右对齐，间距更合理 */
+.el-message-box__btns {
+  display: flex !important;
+  justify-content: flex-end !important;
+  gap: 12px !important;
+  padding: 14px 18px !important;
+  background: linear-gradient(180deg, rgba(255,255,255,0), rgba(250,246,242,0.6)) !important;
+}
+
+/* 取消按钮风格：平面，边框与文字使用中性颜色 */
+.el-message-box__btns .el-button:not(.el-button--primary) {
+  background: var(--surface-color) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-color) !important;
+  box-shadow: none !important;
+  border-radius: 8px !important;
+  padding: 6px 12px !important;
+}
+
+/* 确认按钮：使用主题主色，足够醒目，去除紫色阴影 */
+.el-message-box__btns .el-button--primary {
+  background: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
+  color: #fff !important;
+  box-shadow: 0 6px 14px rgba(18,40,30,0.08) !important;
+  border-radius: 8px !important;
+  padding: 8px 16px !important;
+}
+
+/* 禁用 focus/outline 的紫色 ring（有时库会注入） */
+.el-message-box__btns .el-button--primary:focus,
+.el-message-box__btns .el-button--primary:active,
+.el-message-box__btns .el-button--primary:focus-visible {
+  outline: none !important;
+  box-shadow: 0 6px 14px rgba(18,40,30,0.08) !important;
+}
+
+/* 警告图标与文本布局微调 */
+.el-message-box__content .el-icon-warning,
+.el-message-box__content .el-icon-warning-outline {
+  color: var(--warning-color) !important;
+  font-size: 28px !important;
+  margin-right: 12px !important;
+}
+
+/* 小屏优化：按钮换行且充满宽度 */
+@media (max-width: 520px) {
+  .el-message-box__btns { flex-direction: column-reverse; gap: 8px !important; }
+  .el-message-box__btns .el-button { width: 100% !important; }
+}
+
+/* Radio button fallback */
+.el-radio-button.is-active .el-radio-button__inner,
+.el-radio-button.is-active {
+  background-color: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
+  color: #fff !important;
+}
+

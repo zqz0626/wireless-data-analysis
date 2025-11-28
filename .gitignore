@@ -1,0 +1,64 @@
+# 依赖目录
+node_modules/
+
+# 日志文件
+logs/
+*.log
+
+# 环境配置文件
+.env
+.env.local
+.env.*.local
+
+# 构建输出
+dist/
+build/
+
+# 临时文件
+*.tmp
+*.temp
+
+# IDE配置
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# 数据库文件
+*.db
+*.sqlite
+*.sqlite3
+
+# 上传文件
+uploads/
+
+# 后端依赖（如果有）
+venv/
+.venv/
+pythonenv/
+*.pyc
+__pycache__/
+
+# 测试报告
+coverage/
+.coverage
+
+# 打包文件
+*.tar.gz
+*.zip
+*.rar
+
+# 文档构建
+_site/
+.jekyll-cache/
+
+# 其他
+.cache/
+.temp/
+*.bak
+*.old

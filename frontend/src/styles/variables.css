@@ -1,0 +1,116 @@
+/* CSS 变量与暗色模式支持 */
+:root {
+  /* ============================================
+   按钮主题色系统 - 单一变量源
+   ============================================
+ */
+  /* 核心主题色 */
+  --primary-color: #f77800;
+  --primary-light: #ffa64d;
+  --primary-dark: #cc6000; /* 按下时使用深色 */
+
+  /* Element Plus 主色映射 */
+  --el-color-primary: var(--primary-color);
+  --el-color-primary-light-3: color-mix(in srgb, var(--primary-color) 70%, #ffffff 30%);
+  --el-color-primary-light-5: color-mix(in srgb, var(--primary-color) 50%, #ffffff 50%);
+  --el-color-primary-light-7: color-mix(in srgb, var(--primary-color) 30%, #ffffff 70%);
+  --el-color-primary-light-9: color-mix(in srgb, var(--primary-color) 10%, #ffffff 90%);
+  --el-color-primary-dark-2: var(--primary-dark); /* 按下状态 */
+  --el-color-primary-active: var(--primary-dark);  /* Active状态 */
+
+  /* Element Plus 按钮变量 - 统一指向主题色 */
+  --el-button-bg-color: var(--primary-color);
+  --el-button-border-color: var(--primary-color);
+  --el-button-text-color: #ffffff;
+  --el-button-hover-bg-color: var(--primary-dark);
+  --el-button-hover-border-color: var(--primary-dark);
+  --el-button-active-bg-color: var(--primary-dark);
+  --el-button-active-border-color: var(--primary-dark);
+  --el-button-disabled-bg-color: #ffd6b3;
+  --el-button-disabled-border-color: #ffd6b3;
+  --el-button-disabled-text-color: rgba(255, 255, 255, 0.5);
+  
+  /* 辅助色 */
+  --secondary-color: #165dff;
+  --accent-color: #722ed1;
+  --warning-color: #faad14;
+  --error-color: #f5222d;
+  --success-color: #52c41a;
+  
+  /* 中性色 */
+  --background-color: #f5f7fa;
+  --surface-color: #ffffff;
+  --page-inner-bg: #f0f2f5;
+  --sidebar-bg: #001529;
+  --sidebar-text: #ffffff;
+  --input-bg: #ffffff;
+  --text-primary: #333333;
+  --text-secondary: #666666;
+  --text-light: #999999;
+  --border-color: #e0e0e0;
+  --border-hover: #cccccc;
+  --border-strong: #999999;
+  
+  /* 阴影 */
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  
+  /* 圆角 */
+  --radius-sm: 0.25rem;
+  --radius: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  
+  /* 间距 */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing: 0.75rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+  
+  /* 过渡动画 */
+  --transition-fast: 150ms ease-in-out;
+  --transition: 200ms ease-in-out;
+  --transition-slow: 300ms ease-in-out;
+  
+  /* 字体 */
+  font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  font-weight: 400;
+  
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+  
+  /* 滚动条样式 */
+  --scroll-thumb: rgba(0, 0, 0, 0.2);
+  --scroll-thumb-hover: rgba(0, 0, 0, 0.3);
+  --input-bg-hover: #fafafa;   /* 输入框 hover 时使用深色 */
+  --card-gap: 32px;
+}
+
+/* 深色模式支持 */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background-color: #1a1a1a;
+    --surface-color: #2d2d2d;
+    --text-primary: #ffffff;
+    --text-secondary: #cccccc;
+    --text-light: #999999;
+    --border-color: #404040;
+    --border-hover: #595959;
+    --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+    --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+    --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+    --input-bg-hover: #333333;
+  }
+}
