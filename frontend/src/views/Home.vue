@@ -302,7 +302,6 @@ export default {
                   <span class="book-title-cn">{{ item.title }}</span>
                   <span class="book-title-en">{{ item.en }}</span>
                 </div>
-                <div class="book-desc">{{ item.desc }}</div>
               </div>
             </div>
           </div>
@@ -636,71 +635,146 @@ export default {
   display: flex;
   flex-direction: column;
   position: absolute;
+  align-items: center;
 }
 
 .book-header {
-  font-size: 1.7rem;
+  font-size: 2.5rem;
   font-weight: 800;
-  margin-bottom: 28px;
+  margin-bottom: 32px;
   text-align: center;
   font-family: 'Georgia', 'Times New Roman', serif;
   font-style: italic;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
   color: #c17c7e;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.15);
+  line-height: 1.2;
 }
 
 .book-body {
   display: flex;
   flex-direction: column;
   height: calc(100% - 80px);
-  gap: 0;
+  gap: 20px;
+  width: 100%;
+  max-width: 700px;
+  margin: 0 auto;
+  overflow-y: hidden;
+  padding-right: 0;
+  justify-content: space-around;
 }
 
+/* 隐藏滚动条但保留滚动功能 */
+.book-body {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+/* 隐藏WebKit浏览器滚动条 */
+.book-body::-webkit-scrollbar {
+  display: none;
+}
+
+/* 透明卡片样式 - 文字直接写在书页上效果 */
 .book-row {
   flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 24px 0;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  align-items: center;
+  padding: 25px 24px;
   margin: 0;
+  background: transparent;
+  border-radius: 16px;
+  border: 1px solid transparent;
+  box-shadow: none;
+  transition: all 0.3s ease;
+  min-height: 100px;
+  height: auto;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  text-align: center;
+  width: 100%;
+  max-width: 650px;
+  margin: 0 auto;
 }
 
-.book-row:last-child {
-  border-bottom: none;
+/* 移除卡片装饰元素 */
+.book-row::before {
+  display: none;
 }
 
+/* 卡片悬停效果 - 透明背景下的简洁效果 */
+.book-row:hover {
+  border-color: rgba(183, 110, 121, 0.4);
+  background: rgba(250, 248, 240, 0.3);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); /* 非常淡的阴影效果 */
+}
+
+/* 卡片内容布局 - 标题居左，英文居右 */
 .book-row-main {
   display: flex;
-  align-items: baseline;
+  flex-direction: row;
+  align-items: center;
   justify-content: space-between;
-  margin-bottom: 6px;
+  margin-bottom: 0;
+  gap: 16px;
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  flex-wrap: nowrap;
 }
 
+/* 中文标题样式 - 居左 */
 .book-title-cn {
-  font-weight: 700;
-  font-size: 1.1rem;
+  font-weight: 800;
+  font-size: 1.3rem;
   font-family: 'Georgia', 'Times New Roman', serif;
   font-style: italic;
   letter-spacing: 0.03em;
   color: #3a2f24;
+  line-height: 1.3;
+  margin: 0;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  position: relative;
+  white-space: nowrap;
+  text-align: left;
+  flex-shrink: 0;
 }
 
+/* 中文标题悬停效果 - 简化，只保留颜色变化 */
+.book-row:hover .book-title-cn {
+  color: #b76e79;
+  text-shadow: 1px 1px 3px rgba(183, 110, 121, 0.2);
+}
+
+/* 英文标题样式 - 居右 */
 .book-title-en {
   font-size: 0.9rem;
-  opacity: 0.7;
+  opacity: 0.8;
   font-family: 'Brush Script MT', 'Segoe Script', cursive;
   font-style: italic;
-  color: #4a3a2e;
+  color: #6a5a4e;
+  margin: 0;
+  text-transform: none;
+  letter-spacing: 0.1em;
+  transition: all 0.3s ease;
+  position: relative;
+  white-space: nowrap;
+  text-align: right;
+  flex-shrink: 0;
 }
 
-.book-desc {
-  font-size: 0.9rem;
-  opacity: 0.85;
-  font-weight: 500;
-  color: #5a4a3e;
-  line-height: 1.55;
+/* 英文标题悬停效果 - 简化，只保留颜色变化 */
+.book-row:hover .book-title-en {
+  color: #c17c7e;
+  opacity: 1;
+  font-size: 0.95rem;
 }
+
+/* 移除发光效果 */
 
 /* 书页翻转动画 */
 .fall-down-enter-active {
@@ -969,16 +1043,16 @@ export default {
   padding-right: 0;
 }
 
-/* 统一标签样式 */
+/* 统一透明标签样式 */
 .tech-item,
 .module-item {
   padding: 16px 20px;
-  background: linear-gradient(135deg, rgba(250, 248, 240, 0.8), rgba(245, 230, 210, 0.6));
+  background: transparent;
   border-radius: 10px;
   border-left: 4px solid #b76e79;
-  border-right: 1px solid rgba(183, 110, 121, 0.2);
-  border-bottom: 1px solid rgba(183, 110, 121, 0.2);
-  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+  border-right: 1px solid transparent;
+  border-bottom: 1px solid transparent;
+  box-shadow: none;
   transition: all 0.3s ease;
   min-height: 70px;
   display: flex;
@@ -1017,8 +1091,14 @@ export default {
   margin-top: 0;
   flex-shrink: 0;
   display: -webkit-box;
+  display: -moz-box;
+  display: box;
   -webkit-line-clamp: 2;
+  -moz-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
+  -moz-box-orient: vertical;
+  box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
 }
