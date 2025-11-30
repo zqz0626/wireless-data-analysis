@@ -1565,7 +1565,7 @@
             <template #default="scope">
               <el-tag
                 :style="scope.row.grade === '良' ? { borderColor: '#165DFF', color: '#165DFF' } : ''"
-                :type="scope.row.grade === '优' ? 'success' : scope.row.grade === '中' ? 'warning' : scope.row.grade === '差' ? 'danger' : ''"
+                :type="scope.row.grade === '优' ? 'success' : scope.row.grade === '良' ? 'primary' : scope.row.grade === '中' ? 'warning' : scope.row.grade === '差' ? 'danger' : 'info'"
                 size="small"
                 effect="plain"
               >
@@ -1692,7 +1692,7 @@
 <script>
 import * as echarts from 'echarts'
 import { ElMessage } from 'element-plus'
-import { InfoFilled } from '@element-plus/icons-vue'
+import { InfoFilled, CircleCloseFilled } from '@element-plus/icons-vue'
 import api from '../api/index'
 const { file: fileApi, predictApi, template: templateApi } = api
 
@@ -1704,7 +1704,8 @@ const { file: fileApi, predictApi, template: templateApi } = api
 export default {
   name: 'Predict',
   components: {
-    InfoFilled
+    InfoFilled,
+    CircleCloseFilled
   },
   data() {
     return {
