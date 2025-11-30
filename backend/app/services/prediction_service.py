@@ -1143,118 +1143,7 @@ class PredictionService:
             },
         }
 
-    def llm_timeseries_prediction(
-        self,
-        filename: str,
-        area_column: str,
-        llm_params: Dict[str, Any] | None = None,
-    ) -> Dict[str, Any]:
-        """使用本地大模型进行时间序列预测，遵循 3/4 训练、1/4 测试，并向后预测 1/8。
-
-        在（可选窗口裁剪后的）序列上，使用 _train_test_future_split 统一划分，
-        然后调用 run_llm_forecast 一次性预测 "测试长度 + 未来长度" 个点，
-        前半部分作为测试期预测，后半部分作为真正未来预测。
-        """
-
-        # 1. 加载时间序列并清洗
-        series = self._load_timeseries(filename=filename, area_column=area_column)
-        series = series.astype(float).replace([np.inf, -np.inf], np.nan).dropna()
-
-        params = llm_params or {}
-
-        # 2. 与其它模型保持一致的窗口语义：days_window * 144
-        days_window = int(params.get("days_window", 0) or 0)
-        base_period = 144
-        if days_window > 0:
-            max_points = days_window * base_period
-            if len(series) > max_points:
-                series = series.iloc[-max_points:]
-
-        if len(series) < 16:
-            raise ValueError("时间序列长度过短，不适合大模型预测")
-
-        # 3. 统一切分：3/4 训练 + 1/4 测试 + 1/8 未来
-        split = self._train_test_future_split(series)
-        train_series: pd.Series = split["train"]
-        test_series: pd.Series = split["test"]
-        future_steps: int = split["future_steps"]
-
-        logger.info(
-            "开始 LLM 时间序列预测，文件=%s, 地区=%s, 训练样本=%s, 测试样本=%s, 未来步长=%s",
-            filename,
-            area_column,
-            len(train_series),
-            len(test_series),
-            future_steps,
-        )
-
-        # 4. 让大模型看到窗口内的全部历史，预测 “测试长度 + 未来长度” 个点
-        total_horizon = len(test_series) + future_steps
-
-        llm_cfg = dict(params)
-        # 上面已经按 days_window 截过 series，这里禁用内部再截
-        llm_cfg["days_window"] = 0
-
-        forecast_all = run_llm_forecast(series, total_horizon, llm_cfg)
-        if not forecast_all:
-            raise ValueError("LLM 返回预测结果为空")
-
-        forecast_all = list(forecast_all)
-        test_horizon = len(test_series)
-        test_pred_values = forecast_all[:test_horizon]
-        future_values = forecast_all[test_horizon:]
-
-        # 保证未来长度严格等于 future_steps
-        if len(future_values) < future_steps:
-            last = future_values[-1] if future_values else float(series.iloc[-1])
-            future_values.extend([last] * (future_steps - len(future_values)))
-        elif len(future_values) > future_steps:
-            future_values = future_values[:future_steps]
-
-        # 5. 计算基于测试集的简单 MAE / RMSE
-        metrics: Dict[str, Any] = {}
-        if test_pred_values:
-            import numpy as _np
-
-            y_true = _np.asarray(list(test_series)[: len(test_pred_values)], dtype=float)
-            y_pred = _np.asarray(test_pred_values[: len(y_true)], dtype=float)
-            mask = _np.isfinite(y_true) & _np.isfinite(y_pred)
-            if mask.sum() > 0:
-                diff = y_true[mask] - y_pred[mask]
-                mae = float(_np.mean(_np.abs(diff)))
-                rmse = float(_np.sqrt(_np.mean(diff ** 2)))
-                metrics = {"mae": mae, "rmse": rmse}
-
-        # 6. 构造索引，与其它 *_timeseries_prediction 完全对齐
-        history_index = [ts.isoformat() for ts in series.index]
-        train_index = [ts.isoformat() for ts in train_series.index]
-        test_index = [ts.isoformat() for ts in test_series.index]
-
-        if series.index.inferred_freq is not None:
-            future_index = [
-                ts.isoformat()
-                for ts in pd.date_range(
-                    series.index[-1],
-                    periods=future_steps + 1,
-                    freq=series.index.inferred_freq,
-                )[1:]
-            ]
-        else:
-            future_index = list(range(len(series), len(series) + future_steps))
-
-        return {
-            "area": area_column,
-            "history_index": history_index,
-            "history_values": series.tolist(),
-            "train_index": train_index,
-            "train_values": train_series.tolist(),
-            "test_index": test_index,
-            "test_values": test_series.tolist(),
-            "test_pred_values": list(test_pred_values),
-            "future_index": future_index,
-            "future_forecast_values": future_values,
-            "metrics": metrics,
-        }
+    
 
 
     def batch_predict_by_areas(
@@ -1289,10 +1178,9 @@ class PredictionService:
             area_result: Dict[str, Any] = {}
             timestamps = None
             
-            # 支持多种统计/机器学习/深度学习/大模型：
+            # 支持多种统计/机器学习/深度学习模型：
             # stl_reg（STL+回归）、sarima（SARIMAX）、xgboost（梯度提升树）、
-            # xgb_rf_residual（XGBoost+随机森林残差）、lstm/gru/cnn/tcn（神经网络）、
-            # llm_forecast（本地大模型预测）
+            # xgb_rf_residual（XGBoost+随机森林残差）、lstm/gru/cnn/tcn（神经网络）
             for model in models:
                 try:
                     logger.info(f"开始预测 {area} 地区的 {model} 模型")
@@ -1377,17 +1265,6 @@ class PredictionService:
                             tcn_params=params_for_model,
                         )
                         logger.info(f"TCN 预测成功，返回数据长度: {len(result.get('history_values', []))}")
-                    elif model == 'llm_forecast':
-                        params_for_model = model_params.get(model, {}) if isinstance(model_params, dict) else {}
-                        result = self.llm_timeseries_prediction(
-                            filename=filename,
-                            area_column=area,
-                            llm_params=params_for_model,
-                        )
-                        logger.info(
-                            "LLM 预测成功，返回数据长度: %s",
-                            len(result.get("history_values", [])),
-                        )
                     else:
                         logger.warning(f"模型 {model} 暂未实现，跳过")
                         area_result[model] = []

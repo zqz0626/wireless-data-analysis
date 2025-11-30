@@ -455,10 +455,6 @@ export default {
                 <span class="module-item-desc">包含 LSTM、GRU、CNN、TCN 等深度时序网络，用于挖掘复杂非线性时间序列模式。</span>
               </div>
               <div class="module-item">
-                <span class="module-item-name">大模型</span>
-                <span class="module-item-desc">通过本地大模型预测（qwen2.5:7b）配合 Ollama，对复杂场景的时间序列进行生成式预测与分析。</span>
-              </div>
-              <div class="module-item">
                 <span class="module-item-name">预测结果可视化与分析</span>
                 <span class="module-item-desc">通过折线图和误差指标对比展示不同算法在多区域的预测效果，用于选择最优方案和评估模型质量。</span>
               </div>
@@ -476,23 +472,23 @@ export default {
         class="welcome-overlay"
       >
         <div class="welcome-tags">
-          <div class="welcome-tag tag-data" @click.stop="goToApp">
+          <div class="welcome-tag tag-data" @click.stop="goToModule('/app/data-manage')">
             <div class="welcome-tag-cn">数据管理</div>
             <div class="welcome-tag-en">Data Management</div>
           </div>
-          <div class="welcome-tag tag-preprocess" @click.stop="goToApp">
+          <div class="welcome-tag tag-preprocess" @click.stop="goToModule('/app/preprocess')">
             <div class="welcome-tag-cn">预处理配置</div>
             <div class="welcome-tag-en">Preprocess</div>
           </div>
-          <div class="welcome-tag tag-anomaly" @click.stop="goToApp">
+          <div class="welcome-tag tag-anomaly" @click.stop="goToModule('/app/anomaly')">
             <div class="welcome-tag-cn">异常检测</div>
             <div class="welcome-tag-en">Anomaly Detection</div>
           </div>
-          <div class="welcome-tag tag-cluster" @click.stop="goToApp">
+          <div class="welcome-tag tag-cluster" @click.stop="goToModule('/app/cluster')">
             <div class="welcome-tag-cn">聚类分析</div>
             <div class="welcome-tag-en">Clustering Analysis</div>
           </div>
-          <div class="welcome-tag tag-predict" @click.stop="goToApp">
+          <div class="welcome-tag tag-predict" @click.stop="goToModule('/app/predict')">
             <div class="welcome-tag-cn">预测分析</div>
             <div class="welcome-tag-en">Prediction Analysis</div>
           </div>

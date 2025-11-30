@@ -124,13 +124,6 @@
                     <el-checkbox label="cnn" size="small" class="feature-checkbox" :disabled="isUsingTemplate">CNN 卷积神经网络</el-checkbox>
                     <el-checkbox label="tcn" size="small" class="feature-checkbox" :disabled="isUsingTemplate">TCN 时间卷积网络</el-checkbox>
                   </div>
-                  <!-- 大模型 -->
-                  <div class="model-category">
-                    <span class="category-title">大模型：</span>
-                    <el-checkbox label="llm_forecast" size="small" class="feature-checkbox" :disabled="isUsingTemplate">
-                      大模型预测（gpt-oss:20b）
-                    </el-checkbox>
-                  </div>
                 </el-checkbox-group>
               </div>
               <div class="selected-features-display" v-if="selectedModels.length">
@@ -200,67 +193,6 @@
                         :disabled="isUsingTemplate"
                       />
                       <span class="small-text">（0 或不填：使用全部数据；&gt;0：仅使用最近 N 天数据建模）</span>
-                    </div>
-                  </div>
-                </div>
-              </template>
-
-              <!-- 本地大模型预测 参数 -->
-              <template v-if="selectedModels.includes('llm_forecast')">
-                <div class="param-item algo-block">
-                  <div class="param-title-row">
-                    <div class="param-title">本地大模型预测</div>
-                    <el-button
-                      link
-                      type="primary"
-                      size="small"
-                      @click="toggleParamCollapse('llm_forecast')"
-                    >{{ paramCollapsed.llm_forecast ? '展开' : '收起' }}</el-button>
-                  </div>
-                  <div class="param-desc small-text text-gray-500">
-                    使用本地 Ollama 大模型进行时间序列预测，可在此处控制采样温度、超时时间和窗口天数等关键参数。
-                  </div>
-                  <div v-show="!paramCollapsed.llm_forecast">
-                    <div class="param-row">
-                      <span class="param-label">采样温度 temperature：</span>
-                      <el-input-number
-                        v-model="modelParams.llm_forecast.temperature"
-                        :min="0"
-                        :max="1"
-                        :step="0.05"
-                        size="small"
-                      />
-                      <span class="small-text">（越低越保守，越高越随机，一般建议 0.0~0.3）</span>
-                    </div>
-                    <div class="param-row">
-                      <span class="param-label">超时时间 timeout（秒）：</span>
-                      <el-input-number
-                        v-model="modelParams.llm_forecast.timeout"
-                        :min="30"
-                        :max="600"
-                        size="small"
-                      />
-                      <span class="small-text">（HTTP 请求超时时间，单位秒）</span>
-                    </div>
-                    <div class="param-row">
-                      <span class="param-label">窗口天数 days_window：</span>
-                      <el-input-number
-                        v-model="modelParams.llm_forecast.days_window"
-                        :min="0"
-                        :max="180"
-                        size="small"
-                      />
-                      <span class="small-text">（0：使用全部数据；&gt;0：仅使用最近 N 天数据建模）</span>
-                    </div>
-                    <div class="param-row">
-                      <span class="param-label">每步 token 数 tokens_per_step：</span>
-                      <el-input-number
-                        v-model="modelParams.llm_forecast.tokens_per_step"
-                        :min="1"
-                        :max="16"
-                        size="small"
-                      />
-                      <span class="small-text">（用于近似 num_predict = max(32, horizon × 此值)，数值越大生成越长）</span>
                     </div>
                   </div>
                 </div>
@@ -966,7 +898,7 @@
                       <span class="small-text">（训练批次大小）</span>
                     </div>
                     <div class="param-row">
-                      <span class="param-label">早停耐心值 early_stopping_patience：</span>
+                      <span class="param-label">早停耐心 early_stopping_patience：</span>
                       <el-input-number
                         v-model="modelParams.lstm.early_stopping_patience"
                         :min="5"
@@ -1082,7 +1014,7 @@
                       <span class="small-text">（训练批次大小）</span>
                     </div>
                     <div class="param-row">
-                      <span class="param-label">早停耐心值 early_stopping_patience：</span>
+                      <span class="param-label">早停耐心 early_stopping_patience：</span>
                       <el-input-number
                         v-model="modelParams.gru.early_stopping_patience"
                         :min="5"
@@ -1847,15 +1779,6 @@ export default {
           epochs: 180,
           batch_size: 32,
           early_stopping_patience: 12
-        },
-        // 本地大模型预测参数
-        llm_forecast: {
-          model: 'gpt-oss:20b',
-          temperature: 0.25,
-          timeout: 300,
-          days_window: 7,
-          // 控制每个预测步分配的 token 数，用于推导 num_predict，默认 4
-          tokens_per_step: 4
         }
       },
       singleResult: null,
@@ -1900,8 +1823,7 @@ export default {
         lstm: true,
         gru: true,
         cnn: true,
-        tcn: true,
-        llm_forecast: true
+        tcn: true
       },
 
       // 表格排序状态
@@ -2523,15 +2445,8 @@ export default {
         tcn: {
           history: '#b45309',
           future: '#fbbf24'
-        },
-        // 本地大模型：青蓝色系
-        llm_forecast: {
-          history: '#0EA5E9',
-          future: '#7DD3FC'
         }
       }
-
-      // 准备 x 轴时间数据
       const timestamps = areaData.timestamps || []
       if (!timestamps || timestamps.length === 0) return
 
@@ -2868,11 +2783,6 @@ export default {
       // 使用notMerge=false，保留dataZoom等交互状态
       this.chart.setOption(option, false)
     },
-    // 渲染图表基本框架，包括坐标轴、dataZoom等，不包含具体数据
-    renderChartFramework() {
-      // 直接调用initChart方法，它已经包含了完整的图表基本框架配置
-      this.initChart()
-    },
     getModelName(model) {
       const names = {
         'stl_reg': 'STL + 线性回归',
@@ -2884,22 +2794,21 @@ export default {
         'catboost': 'CatBoost 回归',
         'xgb_rf_residual': 'XGBoost+随机森林 残差修正',
         'cnn': 'CNN 卷积神经网络',
-        'tcn': 'TCN 时间卷积网络',
-        'llm_forecast': '本地大模型预测'
+        'tcn': 'TCN 时间卷积网络'
       }
       return names[model] || model
     },
     // 由于目前只支持ARIMA模型，简化模型选择逻辑
     handleModelsSelectAll(checked) {
       if (checked) {
-        this.selectedModels = ['stl_reg', 'sarima', 'xgboost', 'lightgbm', 'catboost', 'xgb_rf_residual', 'lstm', 'gru', 'cnn', 'tcn', 'llm_forecast']
+        this.selectedModels = ['stl_reg', 'sarima', 'xgboost', 'lightgbm', 'catboost', 'xgb_rf_residual', 'lstm', 'gru', 'cnn', 'tcn']
       } else {
         this.selectedModels = []
       }
       this.isAllModelsSelected = checked
     },
     handleModelsSelect() {
-      const all = ['stl_reg', 'sarima', 'xgboost', 'lightgbm', 'catboost', 'xgb_rf_residual', 'lstm', 'gru', 'cnn', 'tcn', 'llm_forecast']
+      const all = ['stl_reg', 'sarima', 'xgboost', 'lightgbm', 'catboost', 'xgb_rf_residual', 'lstm', 'gru', 'cnn', 'tcn']
       this.isAllModelsSelected = all.every(m => this.selectedModels.includes(m)) && this.selectedModels.length === all.length
     },
     runPredictForSelected() {
