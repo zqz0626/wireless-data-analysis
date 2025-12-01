@@ -356,7 +356,19 @@ wireless-data-analysis/
 
 1. **安装依赖**
    ```bash
+   # 进入后端目录
    cd backend
+
+   # （推荐）创建并激活虚拟环境
+   python -m venv venv
+
+   # Windows PowerShell 激活方式
+   .\venv\Scripts\Activate.ps1
+
+   # Linux / macOS 终端激活方式
+   source venv/bin/activate
+
+   # 在虚拟环境中安装依赖
    pip install -r requirements.txt
    ```
 
