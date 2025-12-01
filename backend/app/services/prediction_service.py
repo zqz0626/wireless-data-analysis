@@ -1,9 +1,27 @@
+"""
+预测分析服务模块
+
+该模块提供了多种时间序列预测模型的实现，包括：
+- STL分解 + 多项式回归
+- SARIMAX季节ARIMA
+- XGBoost梯度提升树
+- LightGBM梯度提升树
+- CatBoost梯度提升树
+- XGBoost + 随机森林残差
+- LSTM深度时序网络
+- GRU深度时序网络
+- CNN一维卷积网络
+- TCN时序卷积网络
+
+支持单地区单模型预测和多地区多模型批量预测，适用于无线业务场景的数据分析和预测。
+"""
+import logging
+from datetime import datetime
+import traceback
 import pandas as pd
 import numpy as np
-import os
-import logging
 from pathlib import Path
-from typing import List, Literal, Dict, Any
+from typing import List, Dict, Any
 
 from statsmodels.tsa.seasonal import STL
 from statsmodels.tsa.statespace.sarimax import SARIMAX
@@ -27,7 +45,7 @@ class PredictionService:
     def __init__(self):
         """初始化预测服务"""
         self.upload_dir = Path(__file__).resolve().parents[2] / "uploads"
-        logger.info("预测分析服务已初始化，上传目录: %s", self.upload_dir)
+        logger.info("预测分析服务初始化完成，上传目录: %s", self.upload_dir)
 
     def _load_timeseries(
         self,
@@ -950,7 +968,6 @@ class PredictionService:
         )
         rf_model.fit(X_train, res_train)
 
-        rf_train_pred = rf_model.predict(X_train)
         rf_test_pred = rf_model.predict(X_test)
 
         # 残差权重：>1 表示更“激进”地使用 RF 残差
@@ -1095,7 +1112,6 @@ class PredictionService:
         # 使用较小的 maxiter 做“粗糙拟合”，在保证速度的前提下获得近似解
         model_fit = model.fit(maxiter=20, disp=False)
 
-        n_train = len(train)
         n_test = len(test)
         n_future = future_steps
 
@@ -1153,10 +1169,8 @@ class PredictionService:
         models: List[str],
         model_params: Dict[str, Any] | None = None,
     ) -> Dict[str, Any]:
-        import pandas as pd
-        from datetime import datetime
         
-        logger.info(f"开始批量预测，文件={filename}, 地区={area_columns}, 模型={models}")
+        logger.info("开始批量预测，文件=%s, 地区=%s, 模型=%s", filename, area_columns, models)
         
         # 加载数据 - 使用绝对路径
         file_path = self.upload_dir / filename
@@ -1172,7 +1186,7 @@ class PredictionService:
         
         for area in area_columns:
             if area not in df.columns:
-                logger.warning(f"地区 {area} 不存在于数据中，跳过")
+                logger.warning("地区 %s 不存在于数据中，跳过", area)
                 continue
                 
             area_result: Dict[str, Any] = {}
@@ -1183,7 +1197,7 @@ class PredictionService:
             # xgb_rf_residual（XGBoost+随机森林残差）、lstm/gru/cnn/tcn（神经网络）
             for model in models:
                 try:
-                    logger.info(f"开始预测 {area} 地区的 {model} 模型")
+                    logger.info("开始预测 %s 地区的 %s 模型", area, model)
 
                     if model == 'stl_reg':
                         params_for_model = model_params.get(model, {}) if isinstance(model_params, dict) else {}
@@ -1371,11 +1385,10 @@ class PredictionService:
                         area_result["test_end_index"] = test_end_index
                         
                 except Exception as e:
-                    error_msg = f"预测失败 {area} - {model}: {str(e)}"
+                    error_msg = "预测失败 %s - %s: %s" % (area, model, str(e))
                     logger.error(error_msg)
-                    logger.error(f"错误详情: {type(e).__name__}")
-                    import traceback
-                    logger.error(f"完整错误堆栈: {traceback.format_exc()}")
+                    logger.error("错误详情: %s", type(e).__name__)
+                    logger.error("完整错误堆栈: %s", traceback.format_exc())
                     area_result[model] = []
             
             # 添加时间戳
@@ -1467,7 +1480,6 @@ class PredictionService:
         X_train = torch.FloatTensor(X_train_np).unsqueeze(-1)
         y_train = torch.FloatTensor(y_train_np).unsqueeze(-1)
         X_test = torch.FloatTensor(X_test_np).unsqueeze(-1)
-        y_test = torch.FloatTensor(y_test_np).unsqueeze(-1)
 
         train_dataset = TensorDataset(X_train, y_train)
         train_loader = DataLoader(
@@ -1566,7 +1578,6 @@ class PredictionService:
             last_seq = torch.FloatTensor(
                 scaled_data[-sequence_length:]
             ).view(1, sequence_length, 1).to(device)
-            history_len = len(series)
             future_steps = max(1, sequence_length // 8)
             future_scaled: list[float] = []
 
@@ -1581,7 +1592,6 @@ class PredictionService:
                 current_seq = torch.FloatTensor(seq_np).unsqueeze(0).to(device)
 
         # 反归一化
-        train_pred = scaler.inverse_transform(train_pred_t).flatten()
         test_pred = scaler.inverse_transform(test_pred_t).flatten()
         future_pred = scaler.inverse_transform(
             np.array(future_scaled).reshape(-1, 1)
@@ -1713,7 +1723,6 @@ class PredictionService:
         X_train = torch.FloatTensor(X_train_np).unsqueeze(1)
         y_train = torch.FloatTensor(y_train_np).unsqueeze(-1)
         X_test = torch.FloatTensor(X_test_np).unsqueeze(1)
-        y_test = torch.FloatTensor(y_test_np).unsqueeze(-1)
 
         train_dataset = TensorDataset(X_train, y_train)
         train_loader = DataLoader(
@@ -1821,7 +1830,6 @@ class PredictionService:
             last_seq = torch.FloatTensor(
                 scaled_data[-sequence_length:]
             ).view(1, 1, sequence_length).to(device)
-            history_len = len(series)
             future_steps = max(1, sequence_length // 8)
             future_scaled: list[float] = []
 
@@ -1836,7 +1844,6 @@ class PredictionService:
                 current_seq = torch.FloatTensor(seq_np).to(device)
 
         # 反归一化
-        train_pred = scaler.inverse_transform(train_pred_t).flatten()
         test_pred = scaler.inverse_transform(test_pred_t).flatten()
         future_pred = scaler.inverse_transform(
             np.array(future_scaled).reshape(-1, 1)
@@ -1967,7 +1974,6 @@ class PredictionService:
         X_train = torch.FloatTensor(X_train_np).unsqueeze(-1)
         y_train = torch.FloatTensor(y_train_np).unsqueeze(-1)
         X_test = torch.FloatTensor(X_test_np).unsqueeze(-1)
-        y_test = torch.FloatTensor(y_test_np).unsqueeze(-1)
 
         train_dataset = TensorDataset(X_train, y_train)
         train_loader = DataLoader(
@@ -2065,7 +2071,6 @@ class PredictionService:
             last_seq = torch.FloatTensor(
                 scaled_data[-sequence_length:]
             ).view(1, sequence_length, 1).to(device)
-            history_len = len(series)
             future_steps = max(1, sequence_length // 8)
             future_scaled: list[float] = []
 
@@ -2080,7 +2085,6 @@ class PredictionService:
                 current_seq = torch.FloatTensor(seq_np).unsqueeze(0).to(device)
 
         # 反归一化
-        train_pred = scaler.inverse_transform(train_pred_t).flatten()
         test_pred = scaler.inverse_transform(test_pred_t).flatten()
         future_pred = scaler.inverse_transform(
             np.array(future_scaled).reshape(-1, 1)
@@ -2212,7 +2216,6 @@ class PredictionService:
         X_train = torch.FloatTensor(X_train_np).unsqueeze(1)
         y_train = torch.FloatTensor(y_train_np).unsqueeze(-1)
         X_test = torch.FloatTensor(X_test_np).unsqueeze(1)
-        y_test = torch.FloatTensor(y_test_np).unsqueeze(-1)
 
         train_dataset = TensorDataset(X_train, y_train)
         train_loader = DataLoader(
@@ -2312,7 +2315,6 @@ class PredictionService:
             last_seq = torch.FloatTensor(
                 scaled_data[-sequence_length:]
             ).view(1, 1, sequence_length).to(device)
-            history_len = len(series)
             future_steps = max(1, sequence_length // 8)
             future_scaled: list[float] = []
 
@@ -2327,7 +2329,6 @@ class PredictionService:
                 current_seq = torch.FloatTensor(seq_np).to(device)
 
         # 反归一化
-        train_pred = scaler.inverse_transform(train_pred_t).flatten()
         test_pred = scaler.inverse_transform(test_pred_t).flatten()
         future_pred = scaler.inverse_transform(
             np.array(future_scaled).reshape(-1, 1)
@@ -2383,14 +2384,6 @@ class PredictionService:
             },
         }
 
-    def _create_lag_features(self, series: pd.Series, lag: int):
-        """创建滞后特征"""
-        X, y = [], []
-        for i in range(lag, len(series)):
-            X.append(series.iloc[i-lag:i].values)
-            y.append(series.iloc[i])
-        return np.array(X), np.array(y)
-
     def _create_sequences(self, data: np.ndarray, sequence_length: int):
         """创建LSTM序列数据"""
         X, y = [], []
@@ -2398,21 +2391,6 @@ class PredictionService:
             X.append(data[i-sequence_length:i])
             y.append(data[i])
         return np.array(X), np.array(y)
-
-    def _recursive_forecast(self, model, last_X, steps, lag):
-        """递归预测"""
-        predictions = []
-        current_X = last_X[-1:].copy()  # 取最后一个样本
-        
-        for _ in range(steps):
-            pred = model.predict(current_X)[0]
-            predictions.append(pred)
-            
-            # 更新特征向量：去掉最早的值，添加新的预测值
-            current_X = np.roll(current_X, -1, axis=1)
-            current_X[0, -1] = pred
-        
-        return np.array(predictions)
 
 
 # 创建全局服务实例

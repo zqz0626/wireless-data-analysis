@@ -12,8 +12,8 @@ class PreprocessService:
     """数据预处理服务类（精简版）"""
 
     def __init__(self) -> None:
-        self.UPLOAD_DIR = Path(__file__).parent.parent.parent / "uploads"
-        self.UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+        self.upload_dir = Path(__file__).parent.parent.parent / "uploads"
+        self.upload_dir.mkdir(parents=True, exist_ok=True)
 
     # 基础 I/O -------------------------------------------------------------
     def read_file(self, file_path: str, extension: str) -> pd.DataFrame:
@@ -35,12 +35,12 @@ class PreprocessService:
         file_id = f"{safe_base}_processed"
 
         filename = f"{file_id}.{extension}"
-        file_path = self.UPLOAD_DIR / filename
+        file_path = self.upload_dir / filename
         counter = 1
         while file_path.exists():
             file_id = f"{safe_base}_processed({counter})"
             filename = f"{file_id}.{extension}"
-            file_path = self.UPLOAD_DIR / filename
+            file_path = self.upload_dir / filename
             counter += 1
 
         if extension == "csv":

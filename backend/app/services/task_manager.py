@@ -23,10 +23,19 @@ class TaskManager:
     """
 
     def __init__(self) -> None:
-        self._tasks: Dict[str, Dict[str, Any]] = {}
+        """初始化任务管理器。"""
+        self._tasks: Dict[str, Any] = {}
         self._lock = Lock()
 
     def create_task(self, params: Dict[str, Any]) -> str:
+        """创建新任务并返回任务ID。
+        
+        Args:
+            params: 任务参数
+            
+        Returns:
+            任务ID字符串
+        """
         task_id = f"anomaly_{uuid.uuid4().hex[:8]}"
         with self._lock:
             self._tasks[task_id] = {
@@ -40,7 +49,12 @@ class TaskManager:
         return task_id
 
     def start_task(self, task_id: str, worker) -> None:
-        """在后台线程中启动任务执行。"""
+        """在后台线程中启动任务执行。
+        
+        Args:
+            task_id: 任务ID
+            worker: 任务执行函数
+        """
 
         def _run() -> None:
             self.update(task_id, status=TaskStatus.RUNNING, progress=0.0)
@@ -55,11 +69,25 @@ class TaskManager:
         t.start()
 
     def update(self, task_id: str, **fields: Any) -> None:
+        """更新任务状态和进度。
+        
+        Args:
+            task_id: 任务ID
+            fields: 要更新的字段
+        """
         with self._lock:
             if task_id in self._tasks:
                 self._tasks[task_id].update(fields)
 
     def get(self, task_id: str) -> Optional[Dict[str, Any]]:
+        """获取任务信息。
+        
+        Args:
+            task_id: 任务ID
+            
+        Returns:
+            任务信息字典，如果任务不存在则返回None
+        """
         with self._lock:
             return self._tasks.get(task_id)
 
