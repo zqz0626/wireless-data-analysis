@@ -264,12 +264,6 @@ export const analysisApi = {
   regenerateScatter: (params) => api.post('/analysis/scatter/regenerate', params),
   
   /**
-   * （旧）执行预测分析 - 已废弃占位
-   * 建议使用 predictApi 中的模型专用接口
-   */
-  predict: (params) => api.post('/analysis/predict', params),
-  
-  /**
    * 执行聚类分析
    * @param {Object} params - 聚类参数
    * @returns {Promise} 请求Promise

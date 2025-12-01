@@ -390,7 +390,69 @@ npm run preview
 
 核心实现：`backend/app/services/prediction_service.py::PredictionService`
 
-> 注意：当前 `/api/analysis/predict` 接口直接返回“预测功能已禁用”，但服务内部已实现 STL + 线性/多项式回归预测逻辑，可在之后打开或扩展为多模型框架。
+> 说明：历史接口 `/api/analysis/predict` 已移除，当前实际使用的预测接口为：
+> - `POST /api/predict/stl-reg`：单地区 STL + 回归预测；
+> - `POST /api/predict/batch-predict`：多地区、多模型的批量预测接口，内部调用 `PredictionService` 中的十种预测模型实现。
+
+#### 3.0 模型列表与适用场景
+
+在批量预测接口 `batch_predict_by_areas` 中，系统支持以下十种预测模型（通过 `models` 参数选择）：
+
+- **stl_reg**（STL + 回归）
+  - **实现**：`sarima_timeseries_prediction`（内部用 STL 分解 + 多项式回归）；
+  - **适用**：有明显趋势和季节性、且希望模型可解释的场景；
+  - **关键参数（`stl_reg_params`）**：`period`（季节周期）、`days_window`（窗口长度）、`degree`（趋势多项式阶数）、`robust`（鲁棒分解）。
+
+- **sarima**（SARIMAX 季节 ARIMA）
+  - **实现**：`sarimax_timeseries_prediction`；
+  - **适用**：平稳性较好、季节性明确的经典时间序列；
+  - **关键参数（`sarima_params`）**：`seasonal_period`、`order_p/d/q`、`seasonal_P/D/Q` 或整体 `order` / `seasonal_order`、`days_window`。
+
+- **xgboost**（梯度提升树回归）
+  - **实现**：`xgboost_timeseries_prediction`；
+  - **适用**：非线性关系强、特征较多的时序回归；
+  - **特征**：滞后窗口 + 统计特征 + 趋势特征 + 正弦/余弦季节特征；
+  - **关键参数（`xgb_params`）**：`lag`、`seasonal_period`、`days_window`、`use_seasonal_features`、`seasonal_harmonics`、`use_trend_features`、`trend_degree`、`n_estimators`、`max_depth`、`learning_rate`、`subsample`、`colsample_bytree`。
+
+- **lightgbm**（LightGBM 回归）
+  - **实现**：`lightgbm_timeseries_prediction`；
+  - **适用**：与 XGBoost 类似，偏向更快的树模型；
+  - **特征**：与 XGBoost 完全一致，便于对比不同树模型；
+  - **关键参数（`lgbm_params`）**：与 XGBoost 对应的 `lag/seasonal_period/days_window/use_*` 等 + `n_estimators`、`max_depth`、`learning_rate`、`subsample`、`colsample_bytree`。
+
+- **catboost**（CatBoost 回归）
+  - **实现**：`catboost_timeseries_prediction`；
+  - **适用**：与 XGBoost/LightGBM 类似，但对某些分布更鲁棒；
+  - **特征**：与 XGBoost 模型保持一致；
+  - **关键参数（`cat_params`）**：`lag`、`seasonal_period`、`days_window`、`use_*` 类参数，以及 `iterations`、`depth`、`learning_rate` 等。
+
+- **xgb_rf_residual**（XGBoost + 随机森林残差）
+  - **实现**：`xgb_rf_residual_timeseries_prediction`；
+  - **适用**：希望在 XGBoost 的基础上进一步拟合复杂残差结构的场景；
+  - **机制**：先用 XGBoost 拟合主序列，再用 RandomForest 回归拟合残差并加权叠加；
+  - **关键参数（`hybrid_params`）**：与 XGBoost 相同的基础参数 + RF 相关参数如 `rf_n_estimators`、`rf_max_depth`、`rf_min_samples_split`、`rf_min_samples_leaf`、`rf_max_features`、`rf_residual_weight` 等。
+
+- **lstm**（LSTM 深度时序网络）
+  - **实现**：`lstm_timeseries_prediction`（PyTorch）；
+  - **适用**：长序列、复杂非线性依赖关系强的场景；
+  - **关键参数（`lstm_params`）**：`sequence_length`（输入序列长度）、`days_window`、`hidden_size`、`num_layers`、`dropout`、`learning_rate`、`epochs`、`batch_size`、`early_stopping_patience`、`bidirectional`。
+
+- **gru**（GRU 深度时序网络）
+  - **实现**：`gru_timeseries_prediction`；
+  - **适用**：与 LSTM 类似，但参数更少，训练更快；
+  - **关键参数（`gru_params`）**：整体与 LSTM 类似，包括 `sequence_length`、`hidden_size`、`num_layers`、`dropout`、`learning_rate`、`epochs` 等。
+
+- **cnn**（一维卷积网络）
+  - **实现**：`cnn_timeseries_prediction`；
+  - **适用**：对局部时间模式敏感的场景（如短期波动、局部峰值）；
+  - **关键参数（`cnn_params`）**：`sequence_length`、卷积层通道数/卷积核大小/步长（在实现中封装）以及学习率、epoch 等训练超参。
+
+- **tcn**（Temporal Convolutional Network）
+  - **实现**：`tcn_timeseries_prediction`；
+  - **适用**：需要在卷积结构中捕获较长依赖关系的时序任务；
+  - **关键参数（`tcn_params`）**：`sequence_length`、层数、扩张系数、卷积核大小、残差结构相关参数，以及学习率/epoch 等训练超参。
+
+在前端“预测分析”模块中，可以将上述模型名称与可选项一一对应，批量预测时通过 `models` 列表传入需要对比的一组模型，并通过 `model_params` 为不同模型分别配置参数。
 
 #### 3.1 数据加载与切分
 

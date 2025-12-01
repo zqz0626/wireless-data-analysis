@@ -214,19 +214,6 @@ async def regenerate_scatter(
         raise HTTPException(status_code=500, detail=f"重建散点图失败: {e}")
 
 
-@router.post("/predict", summary="预测分析")
-async def predict(
-    file_id: str = Body(..., description="文件ID"),
-    predict_model_type: str = Body("linear", alias="model_type", description="模型类型"),
-    parameters: Dict[str, Any] = Body(None, description="预测参数")
-):
-    """使用季节性 SARIMA 进行预测分析（已禁用）。"""
-    return {
-        "success": False,
-        "message": "预测分析功能已禁用",
-        "data": None
-    }
-
 @router.post("/cluster", summary="聚类分析")
 async def cluster_analysis(
     file_id: str = Body(..., description="文件ID"),
